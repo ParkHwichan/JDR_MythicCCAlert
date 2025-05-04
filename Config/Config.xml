@@ -6,4 +6,5 @@
 	<Script file="EnemySpells.lua"/>
 	<Script file="EnemySpellsCooldown.lua"/>
 	<Script file="RaidFlags.lua"/>
+	<Script file="CCAuras.lua"/>
 </Ui>

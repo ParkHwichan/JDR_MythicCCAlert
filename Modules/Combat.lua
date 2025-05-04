@@ -30,29 +30,39 @@ end
 
 function E:GetLeastEnemyNextCast()
     local leastTime = math.huge
+    local now       = GetTime()
 
     for guid, mob in pairs(E.InCombatMobs) do
+        -- 1) 이 몹의 가장 이른 스킬 쿨다운
+        local nextCastMin = math.huge
         if mob.cooldowns then
-            for spellID, cooldown in pairs(mob.cooldowns) do
-                local nextCast = cooldown.nextCast
-                if leastTime > nextCast then
-                    leastTime = nextCast
-                end
+            for _, cd in pairs(mob.cooldowns) do
+                nextCastMin = math.min(nextCastMin, cd.nextCast)
             end
         end
+
+        -- 2) 이 몹의 가장 늦은 CC 만료 시간
+        local ccExpMax = 0
+        if mob.cc then
+            for _, cc in pairs(mob.cc) do
+                ccExpMax = math.max(ccExpMax, cc.expirationTime)
+            end
+        end
+
+        -- 3) CC가 쿨다운보다 길면 CC 만료시간, 아니면 쿨다운 시간
+        local effectiveTime = (ccExpMax > nextCastMin) and ccExpMax or nextCastMin
+
+        -- 4) 전체 중 가장 빠른 시간으로 갱신
+        leastTime = math.min(leastTime, effectiveTime)
     end
 
-    if leastTime == math.huge then
-        leastTime = GetTime()
-    end
-
-    if leastTime < GetTime() then
-        leastTime = GetTime()
+    -- 아무 이벤트가 없다면, 또는 이미 지난 시간이면 '지금'으로 세팅
+    if leastTime == math.huge or leastTime < now then
+        leastTime = now
     end
 
     return leastTime
 end
-
 function E:SetCombatSitu()
     local casterCount = 0
     local ccCount = 0

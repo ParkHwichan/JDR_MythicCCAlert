@@ -92,16 +92,22 @@ f:SetScript("OnEvent", function(self, ...)
 
         if E.Config.enemySpells[extraSpellID] and E.InCombatMobs[dstGUID] then
             -- 1) 적의 시전이 끊겼을 때
-            if E.Config.enemySpellCooldowns[extraSpellID].cooldown then
-                if not E.InCombatMobs[dstGUID].cooldowns then
-                    E.InCombatMobs[dstGUID].cooldowns = {}
-                end
+            if not E.InCombatMobs[dstGUID].cooldowns then
+                E.InCombatMobs[dstGUID].cooldowns = {}
+            end
+
+            if E.Config.enemySpellCooldowns[extraSpellID] and E.Config.enemySpellCooldowns[extraSpellID].cooldown then
+
 
                 E.InCombatMobs[dstGUID].cooldowns[extraSpellID] = {
                     id = extraSpellID,
                     nextCast = GetTime() + E.Config.enemySpellCooldowns[extraSpellID].cooldown,
                 }
-
+            else
+                E.InCombatMobs[dstGUID].cooldowns[extraSpellID] = {
+                    id = extraSpellID,
+                    nextCast = GetTime() + 2,
+                }
             end
         end
     elseif subevent == "SPELL_CHANNEL_START" then

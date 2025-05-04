@@ -4,4 +4,5 @@
 	<Script file="OnSpell.lua"/>
 	<Script file="OnCombat.lua"/>
 	<Script file="OnFrame.lua"/>
+	<Script file="OnAura.lua"/>
 </Ui>

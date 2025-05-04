@@ -150,33 +150,32 @@ E.Config.enemySpellCooldowns = {
 
     -- 부화장 --
     -- Quartermaster Koratite
-    [426893]  = { cooldown = 18.2 },  -- Bounding Void
-    [450628]  = { cooldown = 26.7 },  -- Entropy Shield
+    [426893]  = { cooldown = 18.2, start =  5.2 },  -- Bounding Void
+    [450628]  = { cooldown = 26.7, start =  8.8 },  -- Entropy Shield
 
     -- Voidrider
-    [474018]  = { cooldown = 20.7 },  -- Wild Lightning
-    [427404]  = { cooldown = 23.1 },  -- Localized Storm
+    [474018]  = { cooldown = 20.7, start =  9.2 },  -- Wild Lightning
+    [427404]  = { cooldown = 23.1, start = 15.7 },  -- Localized Storm
 
     -- Cursed Rooktender
-    [427260]  = { cooldown = 18.6 },  -- Lightning Surge
+    [427260]  = { cooldown = 18.6, start =  8.3 },  -- Lightning Surge
 
     -- Void-Cursed Crusher
-    [474031]  = { cooldown = 18.6 },  -- Void Crush
+    [474031]  = { cooldown = 18.6, start =  8.3 },  -- Void Crush
 
     -- Corrupted Oracle
-    [430179]  = { cooldown = 23.1 },  -- Seeping Corruption
+    [430179]  = { cooldown = 23.1, start = 16.5 },  -- Seeping Corruption
 
     -- Coalescing Void Diffuser
-    [430812]  = { cooldown = 21.8 },  -- Attracting Shadows
-    [430805]  = { cooldown = 14.0 },  -- Arcing Void
+    [430812]  = { cooldown = 21.8, start =  5.7 },  -- Attracting Shadows
+    [430805]  = { cooldown = 14.0, start =  8.3 },  -- Arcing Void
 
     -- Void Ascendant
-    [1214546] = { cooldown = 21.8 },  -- Umbral Wave
-    [1214523] = { cooldown = 22.3 },  -- Feasting Void
+    [1214546] = { cooldown = 21.8, start = 15.2 },  -- Umbral Wave
+    [1214523] = { cooldown = 22.3, start = 11.9 },  -- Feasting Void
 
     -- Consuming Voidstone
-    [472764]  = { cooldown = 18.2 },  -- Void Extraction
-    [1214628] = { cooldown = 0    },  -- Unleash Darkness (단발)
+    [472764]  = { cooldown = 18.2, start =  5.6 },  -- Void Extraction
 
 
     -- 양조장 --

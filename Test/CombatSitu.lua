@@ -59,6 +59,17 @@ function E.Test:UpdateMobList()
                     "  %d | %.2f초", spellID, cooldown.nextCast - GetTime()
             )
         end
+
+        if info.cc then
+            for spellID, cc in pairs(info.cc) do
+                -- 한 줄 포맷: 스펠ID | 쿨타임
+                lines[#lines+1] = "CC: " .. info.name .. " | "
+                lines[#lines+1] = string.format(
+                        "  %d | %.2f초", spellID, cc.expirationTime - GetTime()
+                )
+            end
+        end
+
     end
 
     local nextFlash = math.huge
