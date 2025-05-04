@@ -22,10 +22,11 @@ E.Config.spells = {
     [202137] = { name = "침묵", soundPath = "침묵",  ccDuration = 4,  type = "aoeInterrupt",       class = "DEMONHUNTER", cooldown = 120, priority = 118 },  -- 혼돈의 회오리
     [207167] = { name = "진눈", soundPath = "진눈", type = "aoeCC", class = "DEATHKNIGHT", cooldown = 60, priority = 117 },
     [207684] = { name = "공포", soundPath = "공포", type = "aoeCC", class = "DEMONHUNTER", cooldown = 120, priority = 116 }, -- 혼돈의 회오리
-    [61392] = { name = "태풍", soundPath = "태풍", type = "aoeCC", class = "DRUID", cooldown = 30, priority = 115 },
-    [132469] = { name = "태풍", soundPath = "태풍", type = "aoeCC", class = "DRUID", cooldown = 30, priority = 115 },
-    [157980] = {name = "초신성",  soundPath = "초신성", type = "aoeCC", class = "MAGE", cooldown = 45, priority = 114 },
-    [8122] = { name = "영절", soundPath = "영절", type = "aoeCC", class = "PRIEST", cooldown = 60, priority = 113 },
-    [99] = { name = "행불포",soundPath = "행불포", type = "aoeCC", class = "DRUID", cooldown = 30, priority = 112 },
-    [157981] = { name = "초신성", soundPath = "초신성", type = "aoeCC", class = "MAGE", cooldown = 45, priority = 111 },
+    ["interrupt_combine"]  = { name = "개인짤" , soundPath = "짤" , type = "interruptCombine" , class="UNKNOWN", priority = 115 },
+    [61392] = { name = "태풍", soundPath = "태풍", type = "aoeCC", class = "DRUID", cooldown = 30, priority = 114 },
+    [132469] = { name = "태풍", soundPath = "태풍", type = "aoeCC", class = "DRUID", cooldown = 30, priority = 113 },
+    [157980] = {name = "초신성",  soundPath = "초신성", type = "aoeCC", class = "MAGE", cooldown = 45, priority = 112 },
+    [8122] = { name = "영절", soundPath = "영절", type = "aoeCC", class = "PRIEST", cooldown = 60, priority = 111 },
+    [99] = { name = "행불포",soundPath = "행불포", type = "aoeCC", class = "DRUID", cooldown = 30, priority = 110 },
+    [157981] = { name = "초신성", soundPath = "초신성", type = "aoeCC", class = "MAGE", cooldown = 45, priority = 109 },
 }

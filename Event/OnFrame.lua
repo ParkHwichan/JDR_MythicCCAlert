@@ -59,6 +59,11 @@ f:SetScript("OnUpdate", function(self, elapsed)
 
     -- b) 리스트를 spellsToDisplay 에 중복 없이 최대 maxIcon 개수만큼 채워넣는 헬퍼
     local function addSpells(list)
+
+        if not list or #list == 0 then
+            return
+        end
+
         for _, spell in ipairs(list) do
             if #spellsToDisplay >= maxIcon then break end
 
@@ -77,18 +82,59 @@ f:SetScript("OnUpdate", function(self, elapsed)
     end
 
     -- 1) 준비된(onlyReady=true) 메인 스펠
-    addSpells(E:GetSortedGroupSpellsByType(spellTypes.main, maxIcon, true))
+    if spellTypes.main == "interrupt" and spellTypes.interruptCombineNum and spellTypes.interruptCombineNum > 1 then
+        addSpells( E:GetCombinedSpells("interrupt",spellTypes.interruptCombineNum , true) )
+    else
+        addSpells(E:GetSortedGroupSpellsByType(spellTypes.main, maxIcon, true))
+    end
+
+    local skip = 0
     -- 2) 그래도 모자라면 준비된 서브 스펠
     if #spellsToDisplay < maxIcon then
-        addSpells(E:GetSortedGroupSpellsByType(spellTypes.sub, maxIcon, true))
+        local getNum = 0
+        if #spellsToDisplay > 0 then
+            getNum = 1
+        else
+            getNum = 2
+        end
+        local readySub = E:GetSortedGroupSpellsByType(spellTypes.sub, maxIcon, true)
+        if readySub and #readySub > 0 then
+            -- 서브 스펠이 준비된 경우
+            addSpells(readySub)
+            skip = 1
+        end
     end
 
-    -- 3) 모자라면 준비 안 된(onlyReady=false) 메인 스펠
     if #spellsToDisplay < maxIcon then
-        addSpells(E:GetSortedGroupSpellsByType(spellTypes.main, maxIcon, false))
+        -- 3) 쿨타임 중인 메인 스펠
+        if spellTypes.main == "interrupt" and spellTypes.interruptCombineNum and spellTypes.interruptCombineNum > 1 then
+            addSpells( E:GetCombinedSpells("interrupt",spellTypes.interruptCombineNum , false) )
+        else
+            addSpells(E:GetSortedGroupSpellsByType(spellTypes.main, maxIcon, false))
+        end
     end
 
+    -- 3) 그래도 모자라면 준비된 서브 스펠
+    if #spellsToDisplay < maxIcon then
+        local readySub = E:GetSortedGroupSpellsByType(spellTypes.sub, maxIcon, true)
+        if skip and skip == 1 then
+            if readySub and #readySub > 1 then
+                -- 2번째 스킬 부터 추가
+                for i = 2, #readySub do
+                    addSpells({ readySub[i] } )
+                end
+            end
+        else
+            -- 서브 스펠이 준비된 경우
+            addSpells(readySub)
+        end
+    end
 
+    -- 4) 그래도 모자라면 쿨타임 중인 서브 스펠
+    if #spellsToDisplay < maxIcon then
+        local notReadySub = E:GetSortedGroupSpellsByType(spellTypes.sub, maxIcon, false)
+        addSpells(notReadySub)
+    end
 
 
     -- b) 스펠 ID만 뽑아서 비교 → 변경됐으면 풀 재생성

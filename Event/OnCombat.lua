@@ -83,10 +83,13 @@ combatWatcher:RegisterEvent("PLAYER_ENTERING_WORLD")
 combatWatcher:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 
 combatWatcher:SetScript("OnEvent", function(self, event, ...)
-    if event == "PLAYER_REGEN_ENABLED" then
+    if event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_ENTERING_WORLD" or event ==  "ZONE_CHANGED_NEW_AREA" then
         -- 기존: 전투 종료 시 클리어
         wipe(E.InCombatMobs)
         E:SetCombatSitu()
         E.CombatSitu = "NO_COMBAT"
+        if not E.refreshCooldownFrame == nil then
+            E:refreshCooldownFrame()
+        end
     end
 end)

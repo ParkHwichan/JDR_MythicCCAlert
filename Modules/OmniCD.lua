@@ -180,4 +180,39 @@ function E:GetSortedGroupSpellsByType(spellTypes, num, onlyReady)
     return tmp
 end
 
+function E:GetCombinedSpells(spellType, num , onlyReady )
+
+    if not num or num < 1 then
+        return nil
+    end
+
+    local spells = {}
+    if onlyReady then
+        spells = E:GetSortedGroupSpellsByType(spellType, num , true)
+    else
+        spells = E:GetSortedGroupSpellsByType(spellType, num , false)
+    end
+
+    if #spells < num then
+        return nil
+    end
+
+    local spell = spells[1]
+
+    if num == 1 then
+        return spell
+    end
+
+    spell.combined = true
+    spell.combinedSpells = {}
+    for i = 2, num do
+        local spell2 = spells[i]
+        tinsert(spell.combinedSpells, spell2)
+    end
+
+    return {
+        [1] = spell
+    }
+end
+
 

@@ -16,6 +16,39 @@ function E:InitCooldownFrame()
 end
 
 
+local function CreateSpellButton(parent, size, spellID, pointArgs)
+    -- parent: 버튼을 붙일 프레임
+    -- size: 버튼 크기
+    -- spellID: C_Spell.GetSpellTexture 에 넘길 스펠 ID
+    -- pointArgs: { point, relativeFrame, relativePoint, x, y } 형태의 테이블
+
+    local btn = CreateFrame("Frame", nil, parent)
+    btn:SetSize(size, size)
+    if pointArgs then
+        btn:SetPoint(unpack(pointArgs))
+    end
+
+    -- ▶ 아이콘
+    local tex = btn:CreateTexture(nil, "ARTWORK")
+    tex:SetAllPoints(btn)
+    tex:SetTexture(C_Spell.GetSpellTexture(spellID))
+    tex:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+    btn.icon = tex
+
+    -- ▶ 1px 검은 테두리
+    local border = btn:CreateTexture(nil, "BORDER")
+    border:SetColorTexture(0, 0, 0, 1)
+    border:SetPoint("TOPLEFT",     btn, "TOPLEFT",    -1,  1)
+    border:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", 1,  -1)
+    btn.border = border
+
+    -- ▶ 쿨다운 스와이프
+    local cd = CreateFrame("Cooldown", nil, btn, "CooldownFrameTemplate")
+    cd:SetAllPoints(btn)
+    btn.cd = cd
+
+    return btn
+end
 
 -- API: 스펠 아이콘 풀 생성
 -- @param spells table -- 스펠 테이블
@@ -29,80 +62,84 @@ end
 -- 1) SetIconPool 에서 Cooldown 위젯 추가, spell 참조 저장
 function E:SetIconPool(spells)
     local db = E.DB
-    local options = db.cooldownFrame
-    local cooldownFrame = E.CooldownFrame
+    local opts    = db.cooldownFrame
+    local parent  = E.CooldownFrame
+
+    -- ◀ 1) 이전에 만든 버튼들 완전 해제
+    for _, btn in ipairs(parent.iconPool) do
+        -- combinedButtons 까지 전부
+        if btn.combinedButtons then
+            for _, cbtn in ipairs(btn.combinedButtons) do
+                cbtn:Hide()
+                cbtn:UnregisterAllEvents()
+                cbtn:SetScript("OnUpdate", nil)
+                cbtn:SetScript("OnEvent",  nil)
+                cbtn:SetParent(nil)
+            end
+            btn.combinedButtons = nil
+        end
+        -- 메인 버튼
+        btn:Hide()
+        btn:UnregisterAllEvents()
+        btn:SetScript("OnUpdate", nil)
+        btn:SetScript("OnEvent",  nil)
+        btn:SetParent(nil)
+    end
+
+    wipe(parent.iconPool)
     E.CooldownFrame.enemyCast = {}
-
-    -- 초기화
-    for _, btn in ipairs(E.CooldownFrame.iconPool) do btn:Hide() end
-    wipe(E.CooldownFrame.iconPool)
-
-    local baseSize = options.small_size
-    local bigSize = options.big_size
-    local margin = options.margin
 
     local totalW, maxH = 0, 0
 
     for i, spell in ipairs(spells) do
         -- i==1이면 큰 사이즈, 아니면 기본 사이즈
-        local size = (i == 1) and bigSize or baseSize
+        local size = (i == 1) and opts.big_size or opts.small_size
+        local pt   = (i == 1)
+                and { "BOTTOMRIGHT", parent, "BOTTOMRIGHT", 0, 0 }
+                or { "BOTTOMRIGHT", parent.iconPool[i-1], "BOTTOMLEFT", -opts.margin, 0 }
 
         -- 버튼 생성 및 크기
-        local btn = CreateFrame("Frame", nil, cooldownFrame)
-        btn:SetSize(size, size)
-        btn:SetScale(1)  -- 이미 SetSize 로 키웠으니 스케일은 놔둡니다
-        btn.size = size
-
-        -- 위치 잡기: 첫 버튼은 부모의 오른쪽, 나머지는 직전 버튼의 왼쪽
-        if i == 1 then
-            -- 첫 버튼: 프레임 오른쪽에 정렬
-            btn:SetPoint("BOTTOMRIGHT", cooldownFrame, "BOTTOMRIGHT", 0, 0)
-        else
-            -- 그 외: 직전 버튼 왼쪽에 margin 간격만큼 띄워서 정렬
-            btn:SetPoint("BOTTOMRIGHT", E.CooldownFrame.iconPool[i-1], "BOTTOMLEFT", -margin, 0)
-        end
-
-        ----------------------------------------------------
-        -- 아이콘
-        ----------------------------------------------------
-        local tex = btn:CreateTexture(nil, "ARTWORK")
-        tex:SetDrawLayer("OVERLAY")
-        tex:SetSize(size, size)
-        tex:SetPoint("LEFT", btn, "LEFT", 0, 0)
-        tex:SetTexture(C_Spell.GetSpellTexture(spell.id))
-
-        -- ▶ 블리자드 아이콘 “확대” (테두리 잘라내기)
-        tex:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-        btn.icon = tex
-
-        -- ▶ 1px 검은 테두리 추가 (BORDER 레이어)
-        local border = btn:CreateTexture(nil, "BORDER")
-        border:SetColorTexture(0, 0, 0, 1)            -- 완전 검정
-        border:SetPoint("TOPLEFT", btn, "TOPLEFT", -1, 1)
-        border:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", 1, -1)
-
-        -- 3) CD 애니메이션 위젯
-        local cd = CreateFrame("Cooldown", nil, btn, "CooldownFrameTemplate")
-        cd:SetAllPoints(btn)
-        btn.cd = cd
-
-        -- 스펠 정보
+        local btn = CreateSpellButton(parent, size, spell.id, pt)
         btn.spell = spell
         btn.isFlashing = false
+        btn.combinedButtons = {}
+        parent.iconPool[i] = btn
 
-        E.CooldownFrame.iconPool[i] = btn
-
-        -- 부모 크기 누적
-        totalW = totalW + size
+        totalW = totalW + size + (i<#spells and opts.margin or 0)
         maxH   = math.max(maxH, size)
-        if i < #spells then
-            totalW = totalW + margin
+
+        -- 2) combinedSpells 처리
+        if spell.combinedSpells then
+
+            local lastAnchor = btn
+
+
+            for _, comboSpell in ipairs(spell.combinedSpells) do
+                -- combo-icon 은 항상 parent 프레임(=E.CooldownFrame)에 붙이고,
+                -- lastAnchor 의 TOPLEFT 에 comboBtn 의 BOTTOMLEFT 가 딱 붙도록
+                local comboPt = {
+                    "BOTTOMLEFT",    -- comboBtn 기준점
+                    lastAnchor,      -- 붙일 대상
+                    "TOPLEFT",       -- 대상 기준점
+                    0,               -- x 오프셋 (0: 좌우 오차 없이)
+                    0,               -- y 오프셋 (0: 딱 맞붙도록)
+                }
+
+                -- parent 는 항상 최상위 parent
+                local comboBtn = CreateSpellButton(parent, size, comboSpell.id, comboPt)
+                comboBtn.spell = comboSpell
+                table.insert(btn.combinedButtons, comboBtn)
+
+                -- 다음 루프에 이 comboBtn 위에 붙도록
+                lastAnchor = comboBtn
+            end
         end
+
     end
 
     -- 부모 프레임 크기 조정
-    E.CooldownFrame:SetSize(totalW, maxH)
-    return E.CooldownFrame.iconPool
+    parent:SetSize(totalW, maxH)
+    return parent.iconPool
 end
 
 
@@ -147,6 +184,26 @@ function E:RefreshCooldownFrame()
     E:SetIconPool(spells)
 end
 
+local function ControlCooldown(btn, remaining)
+    local s = btn.spell
+
+    s.remaining = remaining
+
+    -- 비활성(쿨중)인 경우
+    if s.remaining and s.remaining > 0 then
+        local baseSec   = (s.baseCD   or 0)   -- baseCD 가 ms 로 들어오는 경우
+        local remainSec = (s.remaining or 0) / 1000
+
+        -- 자연스러운 스와이프를 위해
+        local startTime = GetTime() - (baseSec - remainSec)
+        btn.cd:SetCooldown(startTime, baseSec)
+        btn.cd:Show()
+    else
+        -- 준비 완료
+        btn.cd:Hide()
+    end
+end
+
 -- 상태만 갱신 (매 업데이트)
 function E:UpdateIconPool(spells)
     local db = E.DB
@@ -161,25 +218,16 @@ function E:UpdateIconPool(spells)
 
 
     for i, btn in ipairs(E.CooldownFrame.iconPool) do
-        local s = btn.spell
 
-        s.remaining = spells[i].remaining
-        -- 비활성(쿨중)인 경우
-        if s.remaining and s.remaining > 0 then
-            local baseSec   = (s.baseCD   or 0)   -- baseCD 가 ms 로 들어오는 경우
-            local remainSec = (s.remaining or 0) / 1000
-
-            -- 자연스러운 스와이프를 위해
-            local startTime = GetTime() - (baseSec - remainSec)
-            btn.cd:SetCooldown(startTime, baseSec)
-            btn.cd:Show()
-        else
-            -- 준비 완료
-            btn.cd:Hide()
+        ControlCooldown(btn, spells[i].remaining)
+        for j, cbtn in ipairs(btn.combinedButtons) do
+            local combinedSpells = spells[i].combinedSpells
+            if combinedSpells and combinedSpells[j] then
+                ControlCooldown(cbtn, combinedSpells[j].remaining)
+            end
         end
 
-
-
+        local s = btn.spell
 
         local shouldFlash = (i == 1 and s.unitName == UnitName("player")) and s.remaining == 0  and (GetTime() > nextFlash) and (GetTime() < nextFlash + 3)
 

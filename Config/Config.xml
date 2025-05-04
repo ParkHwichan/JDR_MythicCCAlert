@@ -4,4 +4,5 @@
 	<Script file="Spells.lua"/>
 	<Script file="Monsters.lua"/>
 	<Script file="EnemySpells.lua"/>
+	<Script file="RaidFlags.lua"/>
 </Ui>

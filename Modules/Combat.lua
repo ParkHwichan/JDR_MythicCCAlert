@@ -17,7 +17,8 @@ E.CombatSpellTypes = {
     ["COMBAT_SINGLE_CASTER"] = {  main = "interrupt", sub = "aoeInterrupt" },
     ["COMBAT_DUAL_CASTER"] = { main = "interrupt", sub = {
         "aoeCC", "aoeInterrupt"
-    } },
+    }, interruptCombineNum = 2
+    },
     ["COMBAT_MULTI_CASTER"] = { main = {"aoeInterrupt", "aoeCC"} },
     ["SINGLE_CC"] = { main = {"cc", "aoeCC"} },
     ["MULTI_CC"] = { main = { "aoeCC"} },
