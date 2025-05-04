@@ -51,6 +51,14 @@ function E.Test:UpdateMobList()
                 "%s  |cff00ff00%s|r  |cffff8800%s|r  |cff88ff88%d|r",
                 guid, info.name, info.type, info.spellID
         )
+
+        for spellID, cooldown in pairs(info.cooldowns) do
+            -- 한 줄 포맷: 스펠ID | 쿨타임
+            lines[#lines+1] = "스펠명: " .. info.name .. " | "
+            lines[#lines+1] = string.format(
+                    "  %d | %.2f초", spellID, cooldown.nextCast - GetTime()
+            )
+        end
     end
 
     local nextFlash = math.huge
@@ -62,7 +70,9 @@ function E.Test:UpdateMobList()
         end
     end
 
-    lines[#lines+1] = "다음 캐스트: " .. (nextFlash == math.huge and "없음" or string.format("%.2f초", nextFlash - GetTime()))
+    -- lines[#lines+1] = "다음 캐스트: " .. (nextFlash == math.huge and "없음" or string.format("%.2f초", nextFlash - GetTime()))
+
+    lines[#lines+1] = "안전 시간 : " .. (E:GetLeastEnemyNextCast() - GetTime())
 
     -- 텍스트 갱신
     local textString = table.concat(lines, "\n")

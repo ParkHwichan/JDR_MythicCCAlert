@@ -6,12 +6,46 @@ local f = CreateFrame("Frame")
 -- cumulative time if you want to throttle
 local accumulator = 0
 
+-- 1) 두 스펠(테이블)을 완전 비교하는 헬퍼
+local function compareSpells(s1, s2)
+    -- 기본 id, unitName 비교
+    if s1.id ~= s2.id or s1.unitName ~= s2.unitName then
+        return false
+    end
+
+    -- combinedSpells 유무 비교
+    local cs1, cs2 = s1.combinedSpells, s2.combinedSpells
+    if (cs1 and not cs2) or (cs2 and not cs1) then
+        return false
+    end
+
+    -- 둘 다 nil 이면 여긴 OK
+    if not cs1 then
+        return true
+    end
+
+    -- 길이 비교
+    if #cs1 ~= #cs2 then
+        return false
+    end
+
+    -- 각 combinedSpells 내부의 id 비교
+    for i = 1, #cs1 do
+        if cs1[i].id ~= cs2[i].id then
+            return false
+        end
+    end
+
+    return true
+end
+
+
 -- 1) id와 unitName만 비교하도록 sameList 수정
 local function sameList(a, b)
     if #a ~= #b then return false end
     for i = 1, #a do
         -- a[i], b[i] 는 { id=..., unitName=..., ... } 구조의 테이블
-        if a[i].id ~= b[i].id or a[i].unitName ~= b[i].unitName then
+        if not compareSpells(a[i], b[i]) then
             return false
         end
     end
@@ -81,11 +115,13 @@ f:SetScript("OnUpdate", function(self, elapsed)
         end
     end
 
+    local nextcast = E:GetLeastEnemyNextCast()
+
     -- 1) 준비된(onlyReady=true) 메인 스펠
     if spellTypes.main == "interrupt" and spellTypes.interruptCombineNum and spellTypes.interruptCombineNum > 1 then
-        addSpells( E:GetCombinedSpells("interrupt",spellTypes.interruptCombineNum , true) )
+        addSpells( E:GetCombinedSpells("interrupt",spellTypes.interruptCombineNum , true,nextcast) )
     else
-        addSpells(E:GetSortedGroupSpellsByType(spellTypes.main, maxIcon, true))
+        addSpells(E:GetSortedGroupSpellsByType(spellTypes.main, maxIcon, true ,  nextcast))
     end
 
     local skip = 0
@@ -97,7 +133,7 @@ f:SetScript("OnUpdate", function(self, elapsed)
         else
             getNum = 2
         end
-        local readySub = E:GetSortedGroupSpellsByType(spellTypes.sub, maxIcon, true)
+        local readySub = E:GetSortedGroupSpellsByType(spellTypes.sub, maxIcon, true, nextcast)
         if readySub and #readySub > 0 then
             -- 서브 스펠이 준비된 경우
             addSpells(readySub)
@@ -108,15 +144,15 @@ f:SetScript("OnUpdate", function(self, elapsed)
     if #spellsToDisplay < maxIcon then
         -- 3) 쿨타임 중인 메인 스펠
         if spellTypes.main == "interrupt" and spellTypes.interruptCombineNum and spellTypes.interruptCombineNum > 1 then
-            addSpells( E:GetCombinedSpells("interrupt",spellTypes.interruptCombineNum , false) )
+            addSpells( E:GetCombinedSpells("interrupt",spellTypes.interruptCombineNum , false,nextcast) )
         else
-            addSpells(E:GetSortedGroupSpellsByType(spellTypes.main, maxIcon, false))
+            addSpells(E:GetSortedGroupSpellsByType(spellTypes.main, maxIcon, false, nextcast))
         end
     end
 
     -- 3) 그래도 모자라면 준비된 서브 스펠
     if #spellsToDisplay < maxIcon then
-        local readySub = E:GetSortedGroupSpellsByType(spellTypes.sub, maxIcon, true)
+        local readySub = E:GetSortedGroupSpellsByType(spellTypes.sub, maxIcon, true,nextcast)
         if skip and skip == 1 then
             if readySub and #readySub > 1 then
                 -- 2번째 스킬 부터 추가
@@ -132,7 +168,7 @@ f:SetScript("OnUpdate", function(self, elapsed)
 
     -- 4) 그래도 모자라면 쿨타임 중인 서브 스펠
     if #spellsToDisplay < maxIcon then
-        local notReadySub = E:GetSortedGroupSpellsByType(spellTypes.sub, maxIcon, false)
+        local notReadySub = E:GetSortedGroupSpellsByType(spellTypes.sub, maxIcon, false,nextcast)
         addSpells(notReadySub)
     end
 

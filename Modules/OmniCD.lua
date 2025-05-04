@@ -80,7 +80,7 @@ end
 --- 모든 파티원의 Active 스펠(아이콘으로 띄워진) 목록을 반환
 --- @param type string: "aoeCC", "interrupt", "defensive", "offensive", "utility"
 ---
-function E:GetGroupSpellsByType( type)
+function E:GetGroupSpellsByType(type)
     local out = {}
     local allSpells = E:GetAllGroupSpells()
 
@@ -103,7 +103,7 @@ end
 -- @param num       number|nil: 반환할 최대 개수. nil 이거나 1 미만이면 제한없이 모두 반환.
 -- @param onlyReady boolean|nil: true 이면 remaining ≤ 0 인(준비된) 스펠만 반환.
 -- @return table: { { id, name, type, priority, unitName, remaining, ready, … }, … }
-function E:GetSortedGroupSpellsByType(spellTypes, num, onlyReady)
+function E:GetSortedGroupSpellsByType(spellTypes, num, onlyReady , nextCast)
 
     local typesList = {}
     if type(spellTypes) == "string" then
@@ -116,13 +116,15 @@ function E:GetSortedGroupSpellsByType(spellTypes, num, onlyReady)
 
 
     local now = GetTime()
+    local nextCastRemaining = (nextCast and (nextCast - now) or 0 ) * 1000
     local tmp = {}
-
 
     -- 2) 각 타입마다 뽑아서 onlyReady 조건 필터
     for _, t in ipairs(typesList) do
         for _, spell in ipairs(self:GetGroupSpellsByType(t)) do
-            if not onlyReady or spell.remaining <= 0 then
+            if not onlyReady or (spell.remaining or 0) <= nextCastRemaining then
+
+                spell.remaining = spell.remaining or 0
                 tinsert(tmp, spell)
             end
         end
@@ -130,8 +132,8 @@ function E:GetSortedGroupSpellsByType(spellTypes, num, onlyReady)
 
     -- 2) 우선순위·스펠ID·플레이어 이름 순으로 정렬
     table.sort(tmp, function(a, b)
-        local aReady = (a.remaining or 0) <= 0
-        local bReady = (b.remaining or 0) <= 0
+        local aReady = (a.remaining or 0) <= nextCastRemaining
+        local bReady = (b.remaining or 0) <= nextCastRemaining
 
         if not onlyReady then
             -- 1) ready 스펠 우선
@@ -180,7 +182,7 @@ function E:GetSortedGroupSpellsByType(spellTypes, num, onlyReady)
     return tmp
 end
 
-function E:GetCombinedSpells(spellType, num , onlyReady )
+function E:GetCombinedSpells(spellType, num , onlyReady ,nextCast)
 
     if not num or num < 1 then
         return nil
@@ -188,9 +190,9 @@ function E:GetCombinedSpells(spellType, num , onlyReady )
 
     local spells = {}
     if onlyReady then
-        spells = E:GetSortedGroupSpellsByType(spellType, num , true)
+        spells = E:GetSortedGroupSpellsByType(spellType, num , true, nextCast)
     else
-        spells = E:GetSortedGroupSpellsByType(spellType, num , false)
+        spells = E:GetSortedGroupSpellsByType(spellType, num , false,nextCast)
     end
 
     if #spells < num then

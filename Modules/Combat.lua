@@ -28,6 +28,31 @@ function E:GetCombatSpellTypes()
     return E.CombatSpellTypes[E.CombatSitu]
 end
 
+function E:GetLeastEnemyNextCast()
+    local leastTime = math.huge
+
+    for guid, mob in pairs(E.InCombatMobs) do
+        if mob.cooldowns then
+            for spellID, cooldown in pairs(mob.cooldowns) do
+                local nextCast = cooldown.nextCast
+                if leastTime > nextCast then
+                    leastTime = nextCast
+                end
+            end
+        end
+    end
+
+    if leastTime == math.huge then
+        leastTime = GetTime()
+    end
+
+    if leastTime < GetTime() then
+        leastTime = GetTime()
+    end
+
+    return leastTime
+end
+
 function E:SetCombatSitu()
     local casterCount = 0
     local ccCount = 0

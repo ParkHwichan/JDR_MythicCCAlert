@@ -112,21 +112,21 @@ function E:SetIconPool(spells)
         if spell.combinedSpells then
 
             local lastAnchor = btn
-
+            local comboSize  = math.floor(size * 0.8)
 
             for _, comboSpell in ipairs(spell.combinedSpells) do
                 -- combo-icon 은 항상 parent 프레임(=E.CooldownFrame)에 붙이고,
                 -- lastAnchor 의 TOPLEFT 에 comboBtn 의 BOTTOMLEFT 가 딱 붙도록
                 local comboPt = {
-                    "BOTTOMLEFT",    -- comboBtn 기준점
+                    "BOTTOM",    -- comboBtn 기준점
                     lastAnchor,      -- 붙일 대상
-                    "TOPLEFT",       -- 대상 기준점
+                    "TOP",       -- 대상 기준점
                     0,               -- x 오프셋 (0: 좌우 오차 없이)
                     0,               -- y 오프셋 (0: 딱 맞붙도록)
                 }
 
                 -- parent 는 항상 최상위 parent
-                local comboBtn = CreateSpellButton(parent, size, comboSpell.id, comboPt)
+                local comboBtn = CreateSpellButton(parent, comboSize, comboSpell.id, comboPt)
                 comboBtn.spell = comboSpell
                 table.insert(btn.combinedButtons, comboBtn)
 

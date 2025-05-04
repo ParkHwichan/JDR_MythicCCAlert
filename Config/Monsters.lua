@@ -36,7 +36,7 @@ E.Config.monsters = {
      [213913] = { name = "한방맨" , type = "caster" },
      [208745] = { name = "3넴" , type = "caster", onlyInterrupt = true },
 
-     -- 수문w
+     -- 수문
      [229686] = { name = "조사관" , type = "caster" },
      [231496] = { name = "작살맨" , type = "caster", shareCooldown = true},
      [228424] = { name = "보스쫄" , type = "caster", shareCooldown = true},
@@ -46,11 +46,11 @@ E.Config.monsters = {
      [231312] = { name = "번개맨" , type = "caster" },
 
      -- 왕노
-     [134232] = { name = "암살자" , type = "caster" },
-     [136470] = { name = "상인" , type = "caster" },
-     [130661] = { name = "대지창" , type = "caster" },
-     [130635] = { name = "분노석" , type = "caster" },
-     [133432] = { name = "연금술사" , type = "caster" },
+     [134232] = { name = "암살자" , type = "caster" , spells = {269302, 267354}},
+     [136470] = { name = "상인" , type = "caster", spells={280604}},
+     [130661] = { name = "대지창" , type = "caster", spells={263202}},
+     [130635] = { name = "분노석" , type = "caster", spells={268702}},
+     [133432] = { name = "연금술사" , type = "caster", spells={268797}},
 
      -- 고투
      [164461] = { name = "사델" , type = "caster" },

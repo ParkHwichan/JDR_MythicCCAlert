@@ -85,15 +85,90 @@ f:SetScript("OnEvent", function(self, ...)
     srcGUID, srcName, srcFlags, srcRaidFlags,
     dstGUID, dstName, dstFlags, dstRaidFlags,
     spellID, spellName,
-    extraSpellID, extraSpellName = CombatLogGetCurrentEventInfo()
+    _, extraSpellID = CombatLogGetCurrentEventInfo()
 
     -- 1) 적의 시전을 끊었을 때
     if subevent == "SPELL_INTERRUPT" then
-        E.CooldownFrame.enemyCast[dstGUID] = nil
+
+        if E.Config.enemySpells[extraSpellID] and E.InCombatMobs[dstGUID] then
+            -- 1) 적의 시전이 끊겼을 때
+            if E.Config.enemySpellCooldowns[extraSpellID].cooldown then
+                if not E.InCombatMobs[dstGUID].cooldowns then
+                    E.InCombatMobs[dstGUID].cooldowns = {}
+                end
+
+                E.InCombatMobs[dstGUID].cooldowns[extraSpellID] = {
+                    id = extraSpellID,
+                    nextCast = GetTime() + E.Config.enemySpellCooldowns[extraSpellID].cooldown,
+                }
+
+            end
+        end
+    elseif subevent == "SPELL_CHANNEL_START" then
+        -- spellID: 채널링 시작한 주문
+        -- srcGUID: 시전자 GUID
+        if E.Config.enemySpells[spellID] and E.InCombatMobs[srcGUID] then
+
+                local cd = E.Config.enemySpellCooldowns[spellID] and E.Config.enemySpellCooldowns[spellID].cooldown or 0
+                if cd then
+                    if not E.InCombatMobs[srcGUID].cooldowns then
+                        E.InCombatMobs[srcGUID].cooldowns = {}
+                    end
+                    E.InCombatMobs[srcGUID].cooldowns[spellID] = {
+                        name     = spellName,
+                        id       = spellID,
+                        nextCast = GetTime() + cd,
+                    }
+                end
+
+
+            local nextFlash = GetTime()
+            E.CooldownFrame.enemyCast[srcGUID] = {
+                nextFlash    = nextFlash,
+                nextFlashEnd = nextFlash + 2,
+            }
+        end
+
+        -- 4) 채널이 중단되거나 끝났을 때 정리
+    elseif subevent == "SPELL_CHANNEL_STOP" or subevent == "SPELL_INTERRUPT" then
+
+        -- 1) 적의 시전이 끊겼을 때
+        if E.Config.enemySpellCooldowns[extraSpellID].cooldown then
+            if not E.InCombatMobs[dstGUID].cooldowns then
+                E.InCombatMobs[dstGUID].cooldowns = {}
+            end
+
+            E.InCombatMobs[dstGUID].cooldowns[extraSpellID] = {
+                id = extraSpellID,
+                nextCast = GetTime() + E.Config.enemySpellCooldowns[extraSpellID].cooldown,
+            }
+
+        end
+
+        -- 중단되면 enemyCast 기록 삭제
+        E.CooldownFrame.enemyCast[srcGUID] = nil
     elseif subevent == "UNIT_DIED" or subevent == "UNIT_DESTROYED" then
         E.CooldownFrame.enemyCast[dstGUID] = nil
     elseif subevent == "SPELL_CAST_SUCCESS" then
-        E.CooldownFrame.enemyCast[srcGUID] = nil
+        -- spellID: 성공한 스킬의 ID
+        -- spellName: 성공한 스킬의 이름
+        -- srcGUID: 스킬을 시전한 적의 GUID
+
+
+        -- 1) 적의 스킬 성공을 기준으로
+        if E.Config.enemySpells[spellID] and E.InCombatMobs[srcGUID] then
+            local cd = E.Config.enemySpellCooldowns[spellID] and E.Config.enemySpellCooldowns[spellID].cooldown or 0
+            if cd then
+                if not E.InCombatMobs[srcGUID].cooldowns then
+                    E.InCombatMobs[srcGUID].cooldowns = {}
+                end
+                E.InCombatMobs[srcGUID].cooldowns[spellID] = {
+                    name     = spellName,
+                    id       = spellID,
+                    nextCast = GetTime() + cd,
+                }
+            end
+        end
     elseif subevent == "SPELL_CAST_START" then
         if E.InCombatMobs[srcGUID] and E.Config.enemySpells[spellID] then
             -- 1) 일단 spellID, spellName 은 바로 가져올 수 있고
@@ -135,4 +210,4 @@ f:SetScript("OnEvent", function(self, ...)
             }
         end
     end
-end)
+    end)

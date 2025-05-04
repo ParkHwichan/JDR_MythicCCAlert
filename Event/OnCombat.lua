@@ -25,15 +25,21 @@ local REACTION_HOSTILE  = COMBATLOG_OBJECT_REACTION_HOSTILE
 
 
 f:SetScript("OnEvent", function()
-    local _, subevent,
+    local timestamp, subevent,
     hideCaster,
     srcGUID, srcName, srcFlags, srcRaidFlags,
-    dstGUID, dstName, dstFlags, dstRaidFlags
-    = CombatLogGetCurrentEventInfo()
+    dstGUID, dstName, dstFlags, dstRaidFlags,
+    spellID, spellName,
+    _, extraSpellID = CombatLogGetCurrentEventInfo()
+
 
     -- 1) 공격 행동 계열로 “전투 개시” 판단
     if START_EVENTS[subevent] then
         if not dstFlags then
+            return
+        end
+
+        if spellID == 217832 then
             return
         end
 
@@ -48,6 +54,21 @@ f:SetScript("OnEvent", function()
             return
         end
 
+        if E.InCombatMobs[dstGUID] then
+            return
+        end
+        local cooldowns = {}
+        if npcInfo.spells then
+            for _, spellID in ipairs(npcInfo.spells) do
+                local start = E.Config.enemySpellCooldowns[spellID] and E.Config.enemySpellCooldowns[spellID].start or 0
+
+                cooldowns[spellID] = {
+                    id = spellID,
+                    nextCast = GetTime() + start,
+                }
+            end
+        end
+
         E.InCombatMobs[dstGUID] = {
             name = dstName,
             npcID = npcID,
@@ -59,9 +80,13 @@ f:SetScript("OnEvent", function()
             onlyInterrupt = npcInfo.onlyInterrupt,
             spellID = npcInfo.spellID,
             raidFlag = dstRaidFlags,
+            cooldowns = cooldowns,
         }
 
+
+
         E:SetCombatSitu()
+
 
 
 
