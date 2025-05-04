@@ -1,0 +1,19 @@
+## Interface: 100207
+## Title: JDR_MythicCCAlert
+## Notes: 바보 쐐기 전용 CC 알림 애드온입니다.
+## Version: 1.0
+## Author: JongDaRi
+## Dependencies : OmniCD
+## OptionalDeps: LibSharedMedia-3.0, SharedMedia
+## X-Embeds: LibSharedMedia-3.0
+## SavedVariables: JDR_MythicCCAlertDB
+# --- Libraries ---
+Embeds.xml
+Core\Core.xml
+DB\Db.xml
+Config\Config.xml
+Command\Command.xml
+Utils\Utils.xml
+Modules\Modules.xml
+Event\Event.xml
+# Test\Test.xml
