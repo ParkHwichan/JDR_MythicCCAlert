@@ -16,6 +16,8 @@ E.Config.monsters = {
      -- 수도원
      [206697] = { name = "성직자" , type = "caster" },
      [206698] = { name = "사제" , type = "caster" },
+     [221760] = { name = "마법사", type = "caster"},
+     [206705] = { name = "보병", type = "onlyCC"},
      [212827] = { name = "에이므야" , type = "caster", onlyInterrupt = true },
      [239834] = { name = "듀얼말" , type = "caster", onlyInterrupt = true },
      [207940] = { name = "머프레이" , type = "caster", onlyInterrupt = true },
@@ -23,19 +25,22 @@ E.Config.monsters = {
      -- 양조장
      [218671] = { name = "불놀이꾼" , type = "caster" },
      [220060] = { name = "시식단" , type = "caster" },
+
      [210264] = { name = "조련사" , type = "caster" },
      [220141] = { name = "연발맨" , type = "caster" },
 
      -- 어불동
      [210812] = { name = "점화맨" , type = "caster" },
      [220815] = { name = "폭발맨" , type = "caster" },
+
      [213913] = { name = "한방맨" , type = "caster" },
      [208745] = { name = "3넴" , type = "caster", onlyInterrupt = true },
 
-     -- 수문
+     -- 수문w
      [229686] = { name = "조사관" , type = "caster" },
-     [231496] = { name = "작살맨" , type = "caster", shareCoooldown = true},
-     [228424] = { name = "보스쫄" , type = "caster", shareCoooldown = true},
+     [231496] = { name = "작살맨" , type = "caster", shareCooldown = true},
+     [228424] = { name = "보스쫄" , type = "caster", shareCooldown = true},
+     [229212] = { name = "폭파병" , type = "onlyCC" },
      [231223] = { name = "빙글맨" , type = "caster",  },
      [230748] = { name = "왜곡자" , type = "caster", onlyInterrupt = true },
      [231312] = { name = "번개맨" , type = "caster" },
@@ -57,8 +62,8 @@ E.Config.monsters = {
      [169875] = { name = "구속된영혼" , type = "caster" },
 
      -- 작업장
-     [151657] = { name = "폭탄" , type = "ccOnly" },
-     [236033] = { name = "오물맨" , type = "ccOnly" },
+     [151657] = { name = "폭탄" , type = "caster" },
+     [236033] = { name = "오물맨" , type = "onlyCC" },
      [144294] = { name = "떔장이" , type = "caster" },
 }
 

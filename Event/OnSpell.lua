@@ -4,6 +4,38 @@ local spells = E.Config.spells
 local f = CreateFrame("Frame")
 f:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
+-- E:GetUnitFromGUID(guid) 구현 예시
+function E:GetUnitFromGUID(guid)
+    -- 1) 내 파티/레이드
+    for i = 1, GetNumGroupMembers() do
+        local unit = IsInRaid() and ("raid"..i) or ("party"..i)
+        if UnitGUID(unit) == guid then
+            return unit
+        end
+    end
+
+    -- 2) 내 캐릭터 자신
+    if UnitGUID("player") == guid then
+        return "player"
+    end
+
+    -- 3) 네임플레이트 (15.2+)
+    for i = 1, 40 do
+        local unit = "nameplate"..i
+        if UnitExists(unit) and UnitGUID(unit) == guid then
+            return unit
+        end
+    end
+
+    -- 4) 타겟 / 포커스 등
+    for _, u in ipairs({ "target", "focus", "mouseover" }) do
+        if UnitGUID(u) == guid then
+            return u
+        end
+    end
+
+    return nil
+end
 
 local function HandleAoeCC(spellID , sourceName, aoeInterrupt)
     local usedSpell = spells[spellID]
@@ -55,15 +87,52 @@ f:SetScript("OnEvent", function(self, ...)
     spellID, spellName,
     extraSpellID, extraSpellName = CombatLogGetCurrentEventInfo()
 
-    -- 1) 내가 적의 시전을 끊었을 때
+    -- 1) 적의 시전을 끊었을 때
     if subevent == "SPELL_INTERRUPT" then
-
-        -- 2) 기존 SPELL_CAST_SUCCESS 처리 (내가 주문을 성공적으로 시전했을 때)
+        E.CooldownFrame.enemyCast[dstGUID] = nil
+    elseif subevent == "UNIT_DIED" or subevent == "UNIT_DESTROYED" then
+        E.CooldownFrame.enemyCast[dstGUID] = nil
     elseif subevent == "SPELL_CAST_SUCCESS" then
-        local spells = E.Config.spells
-        local spell = spells[spellID]
-        if spell and spell.ccDuration then
-            E.CooldownFrame.delay = spell.ccDuration
+        E.CooldownFrame.enemyCast[srcGUID] = nil
+    elseif subevent == "SPELL_CAST_START" then
+        if E.InCombatMobs[srcGUID] and E.Config.enemySpells[spellID] then
+            -- 1) 일단 spellID, spellName 은 바로 가져올 수 있고
+            local castSpellID   = spellID
+            local castSpellName = spellName
+
+            -- 2) UnitCastingInfo 로 진짜 캐스트 시간(ms 단위) 얻기
+            --    GUID → unitToken 변환 함수가 필요합니다. (LibUnitGUID 등 활용)
+            local unitToken = E:GetUnitFromGUID(srcGUID)
+            local startTimeMS, endTimeMS, _, _, notInterruptible
+            if unitToken then
+                -- UnitCastingInfo(unit) 반환값: name, _, _, startTimeMS, endTimeMS, _, _
+                _, _, _, startTimeMS, endTimeMS = UnitCastingInfo(unitToken)
+            end
+
+            local castDuration = nil
+            if startTimeMS and endTimeMS then
+                -- 밀리초 → 초 단위로 변환
+                castDuration = (endTimeMS - startTimeMS) / 1000
+            else
+                -- 대안: E.Config.spells 에 미리 정의해 둔 값 사용
+                local cfg = E.Config.spells[castSpellID]
+                castDuration = cfg and cfg.castTime
+            end
+
+            -- 3) 기록 또는 바로 UI 처리
+            E.CooldownFrame.nextCast = {
+                id       = castSpellID,
+                name     = castSpellName,
+                start    = GetTime(),
+                duration = castDuration,
+            }
+
+
+            local nextFlash = math.max(0, (castDuration or 0) - 3) + GetTime()
+            E.CooldownFrame.enemyCast[srcGUID] = {
+                nextFlash = nextFlash,
+                nextFlashEnd = nextFlash + 2,
+            }
         end
     end
 end)

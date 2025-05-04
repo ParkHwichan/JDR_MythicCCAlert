@@ -23,6 +23,7 @@ local REACTION_MASK     = COMBATLOG_OBJECT_REACTION_MASK
 local REACTION_HOSTILE  = COMBATLOG_OBJECT_REACTION_HOSTILE
 
 
+
 f:SetScript("OnEvent", function()
     local _, subevent,
     hideCaster,
@@ -54,15 +55,14 @@ f:SetScript("OnEvent", function()
             lastInterrupt = 0,
             castTime = npcInfo.castTime,
             cooldown = npcInfo.cooldown,
+            shareCooldown = npcInfo.shareCooldown,
+            onlyInterrupt = npcInfo.onlyInterrupt,
             spellID = npcInfo.spellID,
             raidFlag = dstRaidFlags,
         }
 
         E:SetCombatSitu()
 
-        if E.Test then
-            E.Test:UpdateMobList()
-        end
 
 
         -- 2) 몹 사망 시 테이블에서 제거
@@ -88,6 +88,5 @@ combatWatcher:SetScript("OnEvent", function(self, event, ...)
         wipe(E.InCombatMobs)
         E:SetCombatSitu()
         E.CombatSitu = "NO_COMBAT"
-        if E.Test then E.Test:UpdateMobList() end
     end
 end)

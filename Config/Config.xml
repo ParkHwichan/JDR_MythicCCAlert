@@ -3,4 +3,5 @@
 	<Script file="Config.lua"/>
 	<Script file="Spells.lua"/>
 	<Script file="Monsters.lua"/>
+	<Script file="EnemySpells.lua"/>
 </Ui>

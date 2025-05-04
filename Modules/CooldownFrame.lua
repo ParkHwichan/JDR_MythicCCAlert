@@ -5,11 +5,17 @@ function E:InitCooldownFrame()
     E.CooldownFrame = nil
     E.CooldownFrame = CreateFrame("Frame", "JDR_CooldownFrame", UIParent)
     E.CooldownFrame:SetSize(100, 100)
+    E.CooldownFrame:SetFrameStrata("HIGH")
+    E.CooldownFrame:SetFrameLevel(255)
     E.CooldownFrame.iconPool = {}
     E.CooldownFrame.delay = 0
+    E.CooldownFrame.nextFlash = math.huge
+    E.CooldownFrame.enemyCast = {}
     E:RefreshCooldownFrame()
 
 end
+
+
 
 -- API: 스펠 아이콘 풀 생성
 -- @param spells table -- 스펠 테이블
@@ -25,10 +31,7 @@ function E:SetIconPool(spells)
     local db = E.DB
     local options = db.cooldownFrame
     local cooldownFrame = E.CooldownFrame
-    if E.CooldownFrame.delay < 1.5 then
-        E.CooldownFrame.delay = 1.5
-    end
-
+    E.CooldownFrame.enemyCast = {}
 
     -- 초기화
     for _, btn in ipairs(E.CooldownFrame.iconPool) do btn:Hide() end
@@ -110,6 +113,7 @@ function E:RefreshCooldownFrame()
     local db = E.DB
     local options = db.cooldownFrame
 
+
     f:SetPoint("CENTER" , UIParent, "CENTER", db.cooldownFrame.pos_x, db.cooldownFrame.pos_y)
     f:Show()
     if db.cooldownFrame.lock then
@@ -148,6 +152,14 @@ function E:UpdateIconPool(spells)
     local db = E.DB
     local options = db.cooldownFrame
 
+    local nextFlash = math.huge
+    for _, info in pairs( self.CooldownFrame.enemyCast) do
+        if info.nextFlash and info.nextFlash < nextFlash then
+            nextFlash = info.nextFlash
+        end
+    end
+
+
     for i, btn in ipairs(E.CooldownFrame.iconPool) do
         local s = btn.spell
 
@@ -166,7 +178,10 @@ function E:UpdateIconPool(spells)
             btn.cd:Hide()
         end
 
-        local shouldFlash = (i == 1 and s.unitName == UnitName("player")) and s.remaining == 0 and options.show_glow and E.CooldownFrame.delay < 0
+
+
+
+        local shouldFlash = (i == 1 and s.unitName == UnitName("player")) and s.remaining == 0  and (GetTime() > nextFlash) and (GetTime() < nextFlash + 3)
 
         if shouldFlash and not btn.isFlashing then
             btn.isFlashing = true
@@ -184,10 +199,12 @@ function E:UpdateIconPool(spells)
                 if not soundPath and s.type == "interrupt" then
                     soundPath = "짤"
                 end
-                E:PlaySound(true, unitName, class, soundPath)
+                E:PlaySound(false, unitName, class, soundPath)
             end
 
-            LibStub("LibButtonGlow-1.0").ShowOverlayGlow(btn)
+            if options.show_glow then
+                LibStub("LibButtonGlow-1.0").ShowOverlayGlow(btn)
+            end
         elseif not shouldFlash and btn.isFlashing then
             btn.isFlashing = false
             LibStub("LibButtonGlow-1.0").HideOverlayGlow(btn)

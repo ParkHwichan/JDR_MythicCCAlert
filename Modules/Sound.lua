@@ -76,8 +76,8 @@ end
 --- @param soundPath string  -- "제탓", "법사" ...
 ---
 function E:PlaySound(next, playerName, classToken, spellSoundOverride)
-    local interval = 0.65   -- 각 사운드 사이 간격
-    local delay    = 0.4
+    local interval = 0.5   -- 각 사운드 사이 간격
+    local delay    = 0
 
     -- 1) “다음” 사운드도 interval 후에
     if next then

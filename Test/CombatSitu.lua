@@ -53,6 +53,17 @@ function E.Test:UpdateMobList()
         )
     end
 
+    local nextFlash = math.huge
+    for guid, info in pairs(E.CooldownFrame.enemyCast) do
+        -- 한 줄 포맷: GUID | 이름 | 타입 | 스펠ID
+        lines[#lines+1] = table.concat(E:Serialize(info), " | ")
+        if info.nextFlash and info.nextFlash < nextFlash then
+            nextFlash = info.nextFlash
+        end
+    end
+
+    lines[#lines+1] = "다음 캐스트: " .. (nextFlash == math.huge and "없음" or string.format("%.2f초", nextFlash - GetTime()))
+
     -- 텍스트 갱신
     local textString = table.concat(lines, "\n")
     MobGUIDFrame.text:SetText(textString)
@@ -65,3 +76,13 @@ function E.Test:UpdateMobList()
     local totalHeight = paddingTop + (#lines * lineHeight) + paddingBottom
     MobGUIDFrame:SetHeight(totalHeight)
 end
+
+-- 프레임 생성 아래쪽, 또는 UpdateMobList 정의 아래에 추가
+MobGUIDFrame.updateTimer = 0
+MobGUIDFrame:SetScript("OnUpdate", function(self, elapsed)
+    self.updateTimer = self.updateTimer + elapsed
+    if self.updateTimer >= 0.3 then
+        E.Test:UpdateMobList()
+        self.updateTimer = 0
+    end
+end)
