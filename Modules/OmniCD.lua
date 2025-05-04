@@ -168,7 +168,7 @@ function E:GetSortedGroupSpellsByType(spellTypes, num, onlyReady)
     end)
 
     -- 3) num 개수만큼 잘라내기
-    if num and num > 1 then
+    if num and num >= 1 then
         local tmp2 = {}
         for i = 1, math.min(num, #tmp) do
             tinsert(tmp2, tmp[i])

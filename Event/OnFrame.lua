@@ -36,6 +36,11 @@ f:SetScript("OnUpdate", function(self, elapsed)
         -- e.g. scan spells table, update UI, etc.
     end
 
+    if E.showingConfig  then
+        -- config 창이 열려있으면 업데이트 안함
+        return
+    end
+
 
     if E.CombatSitu == "NO_COMBAT" then
         -- iconPool 테이블 비우기 (기존 참조 유지)
@@ -45,10 +50,12 @@ f:SetScript("OnUpdate", function(self, elapsed)
         return
     end
 
+    local DB = E.DB
+
 
     -- a) 현재 보여줄 스펠 목록 가져오기
     local spellTypes      = E:GetCombatSpellTypes()
-    local spellsToDisplay = E:GetSortedGroupSpellsByType(spellTypes, 3, false)
+    local spellsToDisplay = E:GetSortedGroupSpellsByType(spellTypes, DB.cooldownFrame.max_icon, false)
 
     -- b) 스펠 ID만 뽑아서 비교 → 변경됐으면 풀 재생성
     local lastSpells = {}

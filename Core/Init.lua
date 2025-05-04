@@ -12,6 +12,7 @@ AddOn.defaults = {
                                                 margin      = 5,
                                                 pos_x       = 5,
                                                 pos_y       = 5,
+                                                max_icon    = 3,
                                                 show_glow   = true,
                                                 lock        = false,
                                                 sound_alert = true,

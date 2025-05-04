@@ -4,6 +4,91 @@ local E = unpack(select(2, ...))
 -- 라이브러리 로드
 local AceGUI = LibStub("AceGUI-3.0")
 
+local testSpells = {
+    [1] = {
+        guid      = 1,
+        class     = "DEATHKNIGHT",
+        isDeadOrOffline = false,
+        unitName  = "테스트",
+        duration  = "2",
+        enabled   = "true",
+        priority = "999",
+        id        = 192058,
+        name      = "천폭",
+        soundPath = nil,
+        type      = "aoeCC",
+        baseCD    = 40,
+        remaining = 0,
+        ready     = true,
+    },
+    [2] = {
+        guid      = 1,
+        class     = "DEATHKNIGHT",
+        isDeadOrOffline = false,
+        unitName  = "테스트",
+        duration  = "2",
+        enabled   = "true",
+        priority = "999",
+        id        = 51490,
+        name      = "천폭",
+        soundPath = nil,
+        type      = "aoeCC",
+        baseCD    = 40,
+        remaining = 0,
+        ready     = true,
+    },
+    [3] = {
+        guid      = 1,
+        class     = "DEATHKNIGHT",
+        isDeadOrOffline = false,
+        unitName  = "테스트",
+        duration  = "2",
+        enabled   = "true",
+        priority = "999",
+        id        = 57994,
+        name      = "천폭",
+        soundPath = nil,
+        type      = "aoeCC",
+        baseCD    = 40,
+        remaining = 0,
+        ready     = true,
+    },
+    [4] = {
+        guid      = 1,
+        class     = "DEATHKNIGHT",
+        isDeadOrOffline = false,
+        unitName  = "테스트",
+        duration  = "2",
+        enabled   = "true",
+        priority = "999",
+        id        = 370,
+        name      = "천폭",
+        soundPath = nil,
+        type      = "aoeCC",
+        baseCD    = 40,
+        remaining = 0,
+        ready     = true,
+    },
+    [5] = {
+        guid      = 1,
+        class     = "DEATHKNIGHT",
+        isDeadOrOffline = false,
+        unitName  = "테스트",
+        duration  = "2",
+        enabled   = "true",
+        priority = "999",
+        id        = 114050,
+        name      = "천폭",
+        soundPath = nil,
+        type      = "aoeCC",
+        baseCD    = 40,
+        remaining = 0,
+        ready     = true,
+    },
+
+}
+
+
 -- 설정 창 객체 저장용
 local cfgFrame
 -- 실제 위젯을 생성하는 함수
@@ -47,6 +132,21 @@ local function buildConfigWidgets(frame)
     end
 
     -- 3-1) 아이콘 크기 & 간격
+    makeSlider("표시 스킬 갯수", 1, 5, 1, DB.cooldownFrame.max_icon, function(v)
+        DB.cooldownFrame.max_icon = v
+        local tmp = testSpells
+        local num = E.DB.cooldownFrame.max_icon
+        -- 3) num 개수만큼 잘라내기
+        if num and num >= 1 then
+            local tmp2 = {}
+            for i = 1, math.min(num, #tmp) do
+                tinsert(tmp2, tmp[i])
+            end
+            tmp = tmp2
+        end
+        E:SetIconPool(tmp)
+    end)
+
     makeSlider("큰 아이콘 크기", 20, 80, 1, DB.cooldownFrame.big_size, function(v)
         DB.cooldownFrame.big_size = v
         E:RefreshCooldownFrame()
@@ -113,10 +213,13 @@ SlashCmdList["JDR"] = function(msg)
             cfgFrame:SetStatusText("Slash '/jdrcf config' to toggle")
             cfgFrame:SetLayout("Flow")
             cfgFrame:SetWidth(350)
-            cfgFrame:SetHeight(450)
+            cfgFrame:SetHeight(500)
             cfgFrame:EnableResize(false)
             -- 닫을 때 아직 위젯은 유지하되, 프레임만 숨김
-            cfgFrame:SetCallback("OnClose", function(widget) widget:Hide() end)
+            cfgFrame:SetCallback("OnClose", function(widget)
+                E:SetIconPool({})
+                E.showingConfig = false
+                widget:Hide() end)
         else
             -- 이미 만들었던 프레임이면 자식 위젯들 전부 해제
             cfgFrame:ReleaseChildren()
@@ -124,6 +227,18 @@ SlashCmdList["JDR"] = function(msg)
 
         -- 항상 최신 DB 값으로 위젯 재생성
         buildConfigWidgets(cfgFrame)
+        local tmp =  testSpells
+        local num = E.DB.cooldownFrame.max_icon
+        -- 3) num 개수만큼 잘라내기
+        if num and num >= 1 then
+            local tmp2 = {}
+            for i = 1, math.min(num, #tmp) do
+                tinsert(tmp2, tmp[i])
+            end
+            tmp = tmp2
+        end
+        E:SetIconPool(tmp)
+        E.showingConfig = true
         cfgFrame:Show()
 
     else
