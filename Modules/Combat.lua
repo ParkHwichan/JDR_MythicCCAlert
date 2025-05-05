@@ -3,6 +3,8 @@ local E = select(2, ...):unpack()
 -- 전투 중인 몹 풀
 E.InCombatMobs = {}
 
+E.InCombatNameplate = {}
+
 -- 현재 전투 상태
 -- "NO_COMBAT" = 전투 중 아님
 -- "COMBAT_NO_CASTER" = 전투 중이고 캐스터 없음

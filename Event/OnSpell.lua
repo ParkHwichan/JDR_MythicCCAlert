@@ -97,24 +97,25 @@ f:SetScript("OnEvent", function(self, ...)
             end
 
             if E.Config.enemySpellCooldowns[extraSpellID] and E.Config.enemySpellCooldowns[extraSpellID].cooldown then
-
-
                 E.InCombatMobs[dstGUID].cooldowns[extraSpellID] = {
                     id = extraSpellID,
-                    nextCast = GetTime() + E.Config.enemySpellCooldowns[extraSpellID].cooldown,
+                    nextCast = GetTime() + math.max(E.Config.enemySpellCooldowns[extraSpellID].cooldown,2 ),
                 }
+                E.CooldownFrame:SetSafeEndTime(E:GetLeastEnemyNextCast())
+
             else
                 E.InCombatMobs[dstGUID].cooldowns[extraSpellID] = {
                     id = extraSpellID,
                     nextCast = GetTime() + 2,
                 }
+                E.CooldownFrame:SetSafeEndTime(E:GetLeastEnemyNextCast())
+
             end
         end
     elseif subevent == "SPELL_CHANNEL_START" then
         -- spellID: 채널링 시작한 주문
         -- srcGUID: 시전자 GUID
         if E.Config.enemySpells[spellID] and E.InCombatMobs[srcGUID] then
-
                 local cd = E.Config.enemySpellCooldowns[spellID] and E.Config.enemySpellCooldowns[spellID].cooldown or 0
                 if cd then
                     if not E.InCombatMobs[srcGUID].cooldowns then
@@ -125,14 +126,10 @@ f:SetScript("OnEvent", function(self, ...)
                         id       = spellID,
                         nextCast = GetTime() + cd,
                     }
+                    E.CooldownFrame:SetSafeEndTime(E:GetLeastEnemyNextCast())
+
                 end
-
-
             local nextFlash = GetTime()
-            E.CooldownFrame.enemyCast[srcGUID] = {
-                nextFlash    = nextFlash,
-                nextFlashEnd = nextFlash + 2,
-            }
         end
 
         -- 4) 채널이 중단되거나 끝났을 때 정리
@@ -148,7 +145,7 @@ f:SetScript("OnEvent", function(self, ...)
                 id = extraSpellID,
                 nextCast = GetTime() + E.Config.enemySpellCooldowns[extraSpellID].cooldown,
             }
-
+            E.CooldownFrame:SetSafeEndTime(E:GetLeastEnemyNextCast())
         end
 
         -- 중단되면 enemyCast 기록 삭제
@@ -173,6 +170,8 @@ f:SetScript("OnEvent", function(self, ...)
                     id       = spellID,
                     nextCast = GetTime() + cd,
                 }
+                E.CooldownFrame:SetSafeEndTime(E:GetLeastEnemyNextCast())
+
             end
         end
     elseif subevent == "SPELL_CAST_START" then
@@ -199,21 +198,6 @@ f:SetScript("OnEvent", function(self, ...)
                 local cfg = E.Config.spells[castSpellID]
                 castDuration = cfg and cfg.castTime
             end
-
-            -- 3) 기록 또는 바로 UI 처리
-            E.CooldownFrame.nextCast = {
-                id       = castSpellID,
-                name     = castSpellName,
-                start    = GetTime(),
-                duration = castDuration,
-            }
-
-
-            local nextFlash = math.max(0, (castDuration or 0) - 3) + GetTime()
-            E.CooldownFrame.enemyCast[srcGUID] = {
-                nextFlash = nextFlash,
-                nextFlashEnd = nextFlash + 2,
-            }
         end
     end
     end)

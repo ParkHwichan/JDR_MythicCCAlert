@@ -56,6 +56,12 @@ end
 -- set up your per-frame callback
 f:SetScript("OnUpdate", function(self, elapsed)
     -- elapsed is time (in seconds) since the last OnUpdate
+
+    if not E.CooldownFrame then
+        -- 쿨타임 프레임이 없으면 종료
+        return
+    end
+
     accumulator = accumulator + elapsed
 
     -- if you want to run your logic every frame, just put it here:
@@ -78,7 +84,6 @@ f:SetScript("OnUpdate", function(self, elapsed)
         -- iconPool 테이블 비우기 (기존 참조 유지)
         if next(E.CooldownFrame.iconPool) then
             E:SetIconPool({  })
-            E.CooldownFrame.enemyCast = {}
         end
         return
     end

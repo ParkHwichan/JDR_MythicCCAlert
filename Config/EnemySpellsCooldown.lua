@@ -149,6 +149,9 @@ E.Config.enemySpellCooldowns = {
     [435165] = { cooldown = 13.3 },  -- Blazing Strike
 
     -- 부화장 --
+    -- Thunderhead
+    [430109] = { cooldown = 0 , start = 2.1 },
+
     -- Quartermaster Koratite
     [426893]  = { cooldown = 18.2, start =  5.2 },  -- Bounding Void
     [450628]  = { cooldown = 26.7, start =  8.8 },  -- Entropy Shield
@@ -165,6 +168,7 @@ E.Config.enemySpellCooldowns = {
 
     -- Corrupted Oracle
     [430179]  = { cooldown = 23.1, start = 16.5 },  -- Seeping Corruption
+    [430238] = { cooldown = 0, start =  5 },  -- Void Bolt
 
     -- Coalescing Void Diffuser
     [430812]  = { cooldown = 21.8, start =  5.7 },  -- Attracting Shadows

@@ -32,60 +32,8 @@ f:SetScript("OnEvent", function()
     spellID, spellName,
     _, extraSpellID = CombatLogGetCurrentEventInfo()
 
-
     -- 1) 공격 행동 계열로 “전투 개시” 판단
     if START_EVENTS[subevent] then
-        if not dstFlags then
-            return
-        end
-
-        if spellID == 217832 then
-            return
-        end
-
-        local npcID = E:GetNPCIDFromGUID(dstGUID)
-        if not npcID then
-            return
-        end
-
-        local npcInfo = E.Config.monsters[npcID]
-
-        if(not npcInfo) then
-            return
-        end
-
-        if E.InCombatMobs[dstGUID] then
-            return
-        end
-        local cooldowns = {}
-        if npcInfo.spells then
-            for _, spellID in ipairs(npcInfo.spells) do
-                local start = E.Config.enemySpellCooldowns[spellID] and E.Config.enemySpellCooldowns[spellID].start or 0
-
-                cooldowns[spellID] = {
-                    id = spellID,
-                    nextCast = GetTime() + start,
-                }
-            end
-        end
-
-        E.InCombatMobs[dstGUID] = {
-            name = dstName,
-            npcID = npcID,
-            type = npcInfo.type,
-            lastInterrupt = 0,
-            castTime = npcInfo.castTime,
-            cooldown = npcInfo.cooldown,
-            shareCooldown = npcInfo.shareCooldown,
-            onlyInterrupt = npcInfo.onlyInterrupt,
-            spellID = npcInfo.spellID,
-            raidFlag = dstRaidFlags,
-            cooldowns = cooldowns,
-        }
-
-
-
-        E:SetCombatSitu()
 
 
 

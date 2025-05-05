@@ -9,8 +9,8 @@ E.Config.monsters = {
      [225984] = { name = "허수아비" , type = "caster"},
      [225983] = { name = "허수아비" , type = "caster"},]]
      -- 부화장
-     [207198] = { name = "천둥병" , type = "caster", spellID = 403109 },
-     [214439] = { name = "예언자" , type = "caster" },
+     [207198] = { name = "천둥병" , type = "caster", spells = {430109} },
+     [214439] = { name = "예언자" , type = "caster", spells = {430238} },
      [212793] = { name = "승천자" , type = "caster", onlyInterrupt = true },
 
      -- 수도원

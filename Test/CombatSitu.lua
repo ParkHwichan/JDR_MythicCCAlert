@@ -73,6 +73,13 @@ function E.Test:UpdateMobList()
     end
 
     local nextFlash = math.huge
+
+
+    if not E.CooldownFrame then
+        -- 쿨타임 프레임이 없으면 종료
+        return
+    end
+
     for guid, info in pairs(E.CooldownFrame.enemyCast) do
         -- 한 줄 포맷: GUID | 이름 | 타입 | 스펠ID
         lines[#lines+1] = table.concat(E:Serialize(info), " | ")
@@ -85,17 +92,22 @@ function E.Test:UpdateMobList()
 
     lines[#lines+1] = "안전 시간 : " .. (E:GetLeastEnemyNextCast() - GetTime())
 
+    lines[#lines+1] = "---------------------"
+    if E.Nameplate then
+        local infoList = E.Nameplate:GetNameplateInfo()
+        local serialized = E:Serialize(infoList)
+        lines[#lines+1] = table.concat(serialized, "\n")
+    end
     -- 텍스트 갱신
     local textString = table.concat(lines, "\n")
     MobGUIDFrame.text:SetText(textString)
-
     -- 프레임 높이 유동 조절
     local _, fontSize = MobGUIDFrame.text:GetFont()
     local lineHeight  = fontSize + 4       -- 폰트 크기 + 여유
     local paddingTop  = 40                 -- 제목 + 여백
     local paddingBottom = 10
     local totalHeight = paddingTop + (#lines * lineHeight) + paddingBottom
-    MobGUIDFrame:SetHeight(totalHeight)
+    MobGUIDFrame:SetHeight(totalHeight + 200)
 end
 
 -- 프레임 생성 아래쪽, 또는 UpdateMobList 정의 아래에 추가

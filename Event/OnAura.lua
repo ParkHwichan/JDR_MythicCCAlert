@@ -91,6 +91,7 @@ f:SetScript("OnEvent", function(self, event, ...)
                             duration       = duration,
                             expirationTime = expirationTime,
                         }
+                        E.CooldownFrame:SetSafeEndTime(E:GetLeastEnemyNextCast())
                     else
                         if mob.cc then
                             mob.cc[spellID] = nil

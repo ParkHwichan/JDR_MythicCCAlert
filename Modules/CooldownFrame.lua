@@ -1,19 +1,113 @@
 local E = select(2, ...):unpack()
 
 function E:InitCooldownFrame()
-    -- 초기화
-    E.CooldownFrame = nil
-    E.CooldownFrame = CreateFrame("Frame", "JDR_CooldownFrame", UIParent)
-    E.CooldownFrame:SetSize(100, 100)
-    E.CooldownFrame:SetFrameStrata("HIGH")
-    E.CooldownFrame:SetFrameLevel(255)
-    E.CooldownFrame.iconPool = {}
-    E.CooldownFrame.delay = 0
-    E.CooldownFrame.nextFlash = math.huge
-    E.CooldownFrame.enemyCast = {}
-    E:RefreshCooldownFrame()
+    -- 기존 프레임 정리
+    if E.CooldownFrame then
+        E.CooldownFrame:UnregisterAllEvents()
+        E.CooldownFrame:SetScript("OnUpdate", nil)
+        E.CooldownFrame:SetScript("OnEvent",  nil)
+        E.CooldownFrame:SetParent(nil)
+        E.CooldownFrame:Hide()
+        E.CooldownFrame = nil
+    end
 
+    -- 메인 쿨다운 프레임 생성
+    local cf = CreateFrame("Frame", "JDR_CooldownFrame", UIParent)
+    cf:SetSize(200, 50)
+    cf:SetFrameStrata("HIGH")
+    cf:SetFrameLevel(255)
+    cf.iconPool    = {}
+    cf.delay       = 0
+    cf.nextFlash   = math.huge
+    cf.enemyCast   = {}
+    -- Safe Time 바 관련 값 초기화
+    cf.safeEndTime  = nil
+    cf.safeDuration = 0
+
+    --▶ Safe Time Bar (쿨다운 프레임 하위에 attach)
+    local sb = CreateFrame("StatusBar", nil, cf)
+    -- 부모 하단에 붙이되, 좌우는 부모와 0 간격으로
+    sb:SetPoint("TOPLEFT",  cf, "BOTTOMLEFT",  0, -5)
+    sb:SetPoint("TOPRIGHT", cf, "BOTTOMRIGHT", 0, -5)
+    sb:SetHeight(8)   -- 높이만 고정
+
+    -- ▶ 1px 검은 테두리
+    local border = sb:CreateTexture(nil, "BORDER")
+    border:SetColorTexture(0, 0, 0, 1)
+    border:SetPoint("TOPLEFT",     sb, "TOPLEFT",    -1,  1)
+    border:SetPoint("BOTTOMRIGHT", sb, "BOTTOMRIGHT", 1,  -1)
+    sb.border = border
+
+    -- ▶ 배경 (검은색)
+    local bg = sb:CreateTexture(nil, "BACKGROUND")
+    bg:SetAllPoints(sb)
+    bg:SetColorTexture(0, 0, 0, 1)
+    sb.bg = bg
+
+    -- ▶ 전경(fill, 주황색)
+    local fg = sb:CreateTexture(nil, "ARTWORK")
+    fg:SetPoint("TOPLEFT",     sb, "TOPLEFT",     2, -2)
+    fg:SetPoint("BOTTOMRIGHT", sb, "BOTTOMRIGHT", -2, 2)
+    sb:SetStatusBarTexture(fg)
+    fg:SetColorTexture(1, 0.6, 0, 1)
+    sb.fg = fg
+    sb:SetReverseFill(true) -- 기본값: false
+
+    -- ▶ 바 끝에 Blizzard Spark 텍스처
+    local spark = sb:CreateTexture(nil, "OVERLAY")
+    spark:SetBlendMode("ADD")
+    spark:SetTexture("Interface\CastingBar\UI-CastingBar-Spark")  -- 기본 블리자드 spark
+    spark:SetSize(16, 32)  -- spark 텍스처 원본 비율에 맞춰 높이 늘림
+    spark:Hide()
+    sb.spark = spark
+
+    sb.remainingText = sb:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    sb.remainingText:SetPoint("TOPRIGHT", sb, "TOPRIGHT", -2, 2)
+
+    sb:Hide()
+    cf.safeBar = sb
+
+    -- 프레임 핸들러 (예: safeTime 업데이트)
+    -- 프레임 OnUpdate에서 Safe Time 비교
+    -- ▶ OnUpdate: safeEndTime 비교하여 바 업데이트
+    cf:SetScript("OnUpdate", function(self)
+        if self.safeEndTime then
+            local remaining = self.safeEndTime - GetTime()
+            if remaining > 0 then
+                self.safeBar:SetValue(remaining)
+                -- 텍스트 업데이트
+                self.safeBar.remainingText:SetText(string.format("%.1f", remaining))
+                -- Spark 위치 업데이트: fill 끝에 붙이기
+                local fillTex = self.safeBar:GetStatusBarTexture()
+                self.safeBar.spark:ClearAllPoints()
+                self.safeBar.spark:SetPoint("LEFT", fillTex, "RIGHT", 0, 0)
+                self.safeBar.spark:Show()
+            else
+                self.safeEndTime = nil
+                self.safeBar:Hide()
+                self.safeBar.spark:Hide()
+
+            end
+        end
+    end)
+
+    -- Init 완료 후 Refresh 호출
+    E.CooldownFrame = cf
+
+    function E.CooldownFrame:SetSafeEndTime(timestamp)
+        -- timestamp: 쿨타임 종료 시각
+        -- cf.safeEndTime = timestamp
+        -- cf.safeDuration = timestamp - GetTime()
+        self.safeEndTime = timestamp
+        self.safeDuration = timestamp - GetTime()
+        self.safeBar:SetMinMaxValues(0, self.safeDuration)
+        self.safeBar:SetValue(self.safeDuration)
+        self.safeBar:Show()
+    end
+
+    E:RefreshCooldownFrame()
 end
+
 
 
 local function CreateSpellButton(parent, size, spellID, pointArgs)
@@ -87,7 +181,6 @@ function E:SetIconPool(spells)
     end
 
     wipe(parent.iconPool)
-    E.CooldownFrame.enemyCast = {}
 
     local totalW, maxH = 0, 0
 
@@ -205,7 +298,7 @@ local function ControlCooldown(btn, remaining)
 end
 
 -- 상태만 갱신 (매 업데이트)
-function E:UpdateIconPool(spells)
+function E:UpdateIconPool(spells )
     local db = E.DB
     local options = db.cooldownFrame
 
