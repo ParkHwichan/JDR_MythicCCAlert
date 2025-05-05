@@ -96,6 +96,7 @@ local function buildConfigWidgets(frame)
     local DB = E.DB
 
 
+--[[
     -- 1) 애드온 전체 사용 토글
     local cbEnable = AceGUI:Create("CheckBox")
     cbEnable:SetLabel("애드온 사용")
@@ -115,6 +116,7 @@ local function buildConfigWidgets(frame)
         if v then E.CooldownFrame:ShowFrame() else E.CooldownFrame:HideFrame() end
     end)
     frame:AddChild(cbShow)
+]]
 
     -- 3) 슬라이더 생성 헬퍼
     local function makeSlider(name, min, max, step, cur, onChanged)
@@ -210,7 +212,7 @@ SlashCmdList["JDR"] = function(msg)
             -- 첫 생성
             cfgFrame = AceGUI:Create("Frame")
             cfgFrame:SetTitle("JDR MythicCCAlert 설정")
-            cfgFrame:SetStatusText("Slash '/jdrcf config' to toggle")
+            cfgFrame:SetStatusText("Slash '/jdr config' to toggle")
             cfgFrame:SetLayout("Flow")
             cfgFrame:SetWidth(350)
             cfgFrame:SetHeight(500)
@@ -242,6 +244,6 @@ SlashCmdList["JDR"] = function(msg)
         cfgFrame:Show()
 
     else
-        print("|cff00ff00[JDR]|r 사용법: /jdrcf config")
+        print("|cff00ff00[JDR]|r 사용법: /jdr config")
     end
 end

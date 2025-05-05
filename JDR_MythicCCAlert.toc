@@ -16,4 +16,4 @@ Command\Command.xml
 Utils\Utils.xml
 Modules\Modules.xml
 Event\Event.xml
-Test\Test.xml
+# Test\Test.xml
