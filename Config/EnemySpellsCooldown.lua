@@ -150,7 +150,7 @@ E.Config.enemySpellCooldowns = {
 
     -- 부화장 --
     -- Thunderhead
-    [430109] = { cooldown = 0 , start = 2.1 },
+    [430109] = { cooldown = 0 , start = 2.5 },
 
     -- Quartermaster Koratite
     [426893]  = { cooldown = 18.2, start =  5.2 },  -- Bounding Void

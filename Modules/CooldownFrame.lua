@@ -22,7 +22,14 @@ function E:InitCooldownFrame()
     cf.enemyCast   = {}
     -- Safe Time 바 관련 값 초기화
     cf.safeEndTime  = nil
+    cf.lastSafeEndTime = GetTime()
     cf.safeDuration = 0
+
+    cf.lastFirstButton = {
+        player = nil,
+        spellID = nil,
+        remaining = 0,
+    }
 
     --▶ Safe Time Bar (쿨다운 프레임 하위에 attach)
     local sb = CreateFrame("StatusBar", nil, cf)
@@ -64,6 +71,7 @@ function E:InitCooldownFrame()
     sb.remainingText = sb:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     sb.remainingText:SetPoint("TOPRIGHT", sb, "TOPRIGHT", -2, 2)
 
+    sb.showing = false
     sb:Hide()
     cf.safeBar = sb
 
@@ -74,6 +82,7 @@ function E:InitCooldownFrame()
         if self.safeEndTime then
             local remaining = self.safeEndTime - GetTime()
             if remaining > 0 then
+                sb.showing = true
                 self.safeBar:SetValue(remaining)
                 -- 텍스트 업데이트
                 self.safeBar.remainingText:SetText(string.format("%.1f", remaining))
@@ -83,10 +92,10 @@ function E:InitCooldownFrame()
                 self.safeBar.spark:SetPoint("LEFT", fillTex, "RIGHT", 0, 0)
                 self.safeBar.spark:Show()
             else
+                self.lastSafeEndTime = self.safeEndTime + 0.3
                 self.safeEndTime = nil
                 self.safeBar:Hide()
                 self.safeBar.spark:Hide()
-
             end
         end
     end)
@@ -99,6 +108,7 @@ function E:InitCooldownFrame()
         -- cf.safeEndTime = timestamp
         -- cf.safeDuration = timestamp - GetTime()
         self.safeEndTime = timestamp
+        self.lastSafeEndTime = timestamp + 0.45
         self.safeDuration = timestamp - GetTime()
         self.safeBar:SetMinMaxValues(0, self.safeDuration)
         self.safeBar:SetValue(self.safeDuration)
@@ -107,7 +117,6 @@ function E:InitCooldownFrame()
 
     E:RefreshCooldownFrame()
 end
-
 
 
 local function CreateSpellButton(parent, size, spellID, pointArgs)
@@ -298,7 +307,7 @@ local function ControlCooldown(btn, remaining)
 end
 
 -- 상태만 갱신 (매 업데이트)
-function E:UpdateIconPool(spells )
+function E:UpdateIconPool(spells)
     local db = E.DB
     local options = db.cooldownFrame
 
@@ -322,10 +331,20 @@ function E:UpdateIconPool(spells )
 
         local s = btn.spell
 
-        local shouldFlash = (i == 1 and s.unitName == UnitName("player")) and s.remaining == 0  and (GetTime() > nextFlash) and (GetTime() < nextFlash + 3)
+        local isFirst = (i == 1)
+        local isPlayer = (s.unitName == UnitName("player"))
+        local isReady = (s.remaining == 0)
+        local isNotSafe =  GetTime() > E.CooldownFrame.lastSafeEndTime
+        local isLastBtn = E.CooldownFrame.lastFirstButton.player == s.unitName and E.CooldownFrame.lastFirstButton.spellID == s.id
 
-        if shouldFlash and not btn.isFlashing then
-            btn.isFlashing = true
+        local shouldFlash = isFirst and isPlayer and isReady and isNotSafe and not isLastBtn
+
+        if shouldFlash  then
+            E.CooldownFrame.lastFirstButton = {
+                player = s.unitName,
+                spellID = s.id,
+                remaining = s.remaining,
+            }
 
             if options.sound_alert then
                 local unitName = s.unitName or UNKNOWN
@@ -346,8 +365,14 @@ function E:UpdateIconPool(spells )
             if options.show_glow then
                 LibStub("LibButtonGlow-1.0").ShowOverlayGlow(btn)
             end
-        elseif not shouldFlash and btn.isFlashing then
-            btn.isFlashing = false
+        elseif not isLastBtn then
+            LibStub("LibButtonGlow-1.0").HideOverlayGlow(btn)
+        elseif not isReady then
+            E.CooldownFrame.lastFirstButton = {
+                player = nil,
+                spellID = nil,
+                remaining = 0,
+            }
             LibStub("LibButtonGlow-1.0").HideOverlayGlow(btn)
         end
     end

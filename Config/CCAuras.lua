@@ -43,6 +43,9 @@ E.Config.CCAuras = {
         [5484] = { name = "Howl of Terror" },       -- Warlock :contentReference[oaicite:9]{index=9}
         [6358] = { name = "Seduction" },            -- Succubus :contentReference[oaicite:10]{index=10}
         [118699] = { name = "Fear" },               -- Demon Hunter :contentReference[oaicite:11]{index=11}
+    },
+    cc = {
+        [217832] = {name = "감금"}
     }
 
 }

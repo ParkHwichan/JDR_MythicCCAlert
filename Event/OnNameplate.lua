@@ -44,7 +44,6 @@ end
 NPWatcher:SetScript("OnEvent", function(self, event, unit, ...)
     if event == "PLAYER_ENTERING_WORLD" then
         wipe(tracked)
-        print("Nameplate threat tracking initialized.")
         return
     end
 
@@ -100,6 +99,8 @@ NPWatcher:SetScript("OnEvent", function(self, event, unit, ...)
                 raidFlag      = -1,
                 cooldowns     = cooldowns,
             }
+
+            E.CooldownFrame:SetSafeEndTime(E:GetLeastEnemyNextCast())
 
             if E.SetCombatSitu then E:SetCombatSitu() end
         end
