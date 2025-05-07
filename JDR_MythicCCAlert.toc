@@ -1,12 +1,13 @@
 ## Interface: 100207
 ## Title: JDR_MythicCCAlert
-## Notes: 바보 쐐기 전용 CC 알림 애드온입니다.
-## Version: 1.0
+## Notes: 쐐기 광역 CC 및 차단 알림
+## Version: 1.0.02
 ## Author: JongDaRi
 ## Dependencies : OmniCD
 ## OptionalDeps: LibSharedMedia-3.0, SharedMedia
 ## X-Embeds: LibSharedMedia-3.0
 ## SavedVariables: JDR_MythicCCAlertDB
+## IconTexture: Interface\AddOns\JDR_MythicCCAlert\Media\logo
 # --- Libraries ---
 Embeds.xml
 Core\Core.xml

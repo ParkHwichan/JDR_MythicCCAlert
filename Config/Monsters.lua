@@ -27,12 +27,21 @@ E.Config.monsters = {
      [220060] = { name = "시식단" , type = "caster" , spells = {441242}},
      [210264] = { name = "조련사" , type = "caster", spells = {441351} },
      [220141] = { name = "연발맨" , type = "caster" , spells = {440687}},
+     [218016] = { name = "보스쫄", type = "onlyCC" , spells= {438971}},
 
      -- 어불동
      [210812] = { name = "점화맨" , type = "caster" , spells = {423479}},
      [220815] = { name = "폭발맨" , type = "caster", spells = {424322} },
+     [223777] = { name = "보스방 폭발맨" , type = "caster", spells = {424322} },
+     [223770] = { name = "보스방 폭발맨" , type = "caster", spells = {424322} },
+     [223775] = { name = "보스방 폭발맨" , type = "caster", spells = {424322} },
+     [223776] = { name = "보스방 폭발맨" , type = "caster", spells = {424322} },
+     [223772] = { name = "보스방 폭발맨" , type = "caster", spells = {424322} },
+     [223773] = { name = "보스방 폭발맨" , type = "caster", spells = {424322} },
+     [223778] = { name = "보스방 폭발맨" , type = "caster", spells = {424322} },
+     [223774] = { name = "보스방 폭발맨" , type = "caster", spells = {424322} },
      [213913] = { name = "한방맨" , type = "caster" },
-     [208745] = { name = "3넴" , type = "caster", onlyInterrupt = true },
+     [208745] = { name = "3넴" , type = "caster", onlyInterrupt = true , spells={426145}},
 
      -- 수문
      [229686] = { name = "조사관" , type = "caster" , spells={462771} },

@@ -3,6 +3,8 @@ local E = select(2, ...):unpack()
 E.Config.enemySpellCooldowns = {
 
     -- 어불동 --
+    -- 3넴
+    [426145] = { cooldown = 10.5, start = 10.5 }, -- Paranoid Mind
     -- Rank Overseer
     [423501] = { cooldown = 21.9 }, -- Wild Wallop
     [428066] = { cooldown = 23.1 }, -- Overpowering Roar
@@ -184,48 +186,51 @@ E.Config.enemySpellCooldowns = {
 
     -- 양조장 --
     -- Venture Co. Pyromaniac
-    [437721] = { cooldown = 24.2 },  -- Boiling Flames
-    [437956] = { cooldown = 17.0 },  -- Erupting Inferno
+    [437721] = { cooldown = 24.2, start = 15.6 },  -- Boiling Flames
+    [437956] = { cooldown = 17.0, start =  9.1 },  -- Erupting Inferno
 
     -- Venture Co. Patron
-    [434773] = { cooldown = 14.8 },  -- Mean Mug
+    [434773] = { cooldown = 14.8, start =  8.3 },  -- Mean Mug
 
     -- Hired Muscle
-    [463218] = { cooldown = 24.2 },  -- Volatile Keg
-    [434756] = { cooldown = 15.7 },  -- Throw Chair
+    [463218] = { cooldown = 24.2, start =  8.0 },  -- Volatile Keg
+    [434756] = { cooldown = 15.7, start = 12.0 },  -- Throw Chair
 
     -- Tasting Room Attendant
-    [434706] = { cooldown = 12.1 },  -- Cinderbrew Toss
+    [434706] = { cooldown = 12.1, start = 13.2 },  -- Cinderbrew Toss
 
     -- Chef Chewie
-    [463206] = { cooldown = 18.2 },  -- Tenderize
-    [434998] = { cooldown = 21.8 },  -- High Steaks
+    [463206] = { cooldown = 18.2, start =  8.0 },  -- Tenderize
+    [434998] = { cooldown = 21.8, start = 11.9 },  -- High Steaks
 
     -- Flavor Scientist
-    [441627] = { cooldown = 24.4 },  -- Rejuvenating Honey
-    [441434] = { cooldown = 23.0 },  -- Failed Batch
+    [441627] = { cooldown = 24.4, start = 12.1 },  -- Rejuvenating Honey
+    [441434] = { cooldown = 23.0, start =  8.1 },  -- Failed Batch
 
     -- Careless Hopgoblin
-    [448619] = { cooldown = 30.3 },  -- Reckless Delivery
+    [448619] = { cooldown = 30.3, start =  8.8 },  -- Reckless Delivery
 
     -- Taste Tester
-    [441214] = { cooldown = 23.1 },  -- Spill Drink
-    [441242] = { cooldown = 16.9 },  -- Free Samples
+    [441214] = { cooldown = 23.1, start = 11.4 },  -- Spill Drink
+    [441242] = { cooldown = 16.9, start =  9.2 },  -- Free Samples
 
     -- Bee Wrangler
-    [441119] = { cooldown = 15.3 },  -- Bee-Zooka
-    [441351] = { cooldown = 18.8 },  -- Bee-stial Wrath
+    [441119] = { cooldown = 15.3, start =  4.1 },  -- Bee-Zooka
+    [441351] = { cooldown = 18.8, start =  9.4 },  -- Bee-stial Wrath
 
     -- Venture Co. Honey Harvester
-    [442589] = { cooldown = 25.1 },  -- Beeswax
-    [442995] = { cooldown = 23.1 },  -- Swarming Surprise
+    [442589] = { cooldown = 25.1, start = 16.7 },  -- Beeswax
+    [442995] = { cooldown = 23.1, start =  8.1 },  -- Swarming Surprise
 
     -- Royal Jelly Purveyor
-    [440687] = { cooldown = 25.0 },  -- Honey Volley
-    [440876] = { cooldown = 17.0 },  -- Rain of Honey
+    [440687] = { cooldown = 25.0, start =  8.9 },  -- Honey Volley
+    [440876] = { cooldown = 17.0, start = 15.0 },  -- Rain of Honey
 
     -- Yes Man
-    [439467] = { cooldown = 13.4 },  -- Downward Trend
+    [439467] = { cooldown = 13.4, start =  6.9 },  -- Downward Trend
+
+    -- 분쇄독침
+    [438971] = { cooldown =  6.1, start =  8.1 },  -- 분쇄독침
 
     -- Workshop
     [301088] = { cooldown = 0    },  -- Detonate
@@ -255,7 +260,7 @@ E.Config.enemySpellCooldowns = {
     [267354]  = { cooldown = 20.3, start = 13.0 },  -- Fan of Knives
     [473168]  = { cooldown = 26.7, start = 14.8 },  -- Rapid Extraction
     [1215411] = { cooldown = 22.6, start =  9.1 },  -- Puncture
-    [263202]  = { cooldown = 24.2, start =  8.3 },  -- Rock Lance (Normal)
+    [263202]  = { cooldown = 0, start =  8.3 },  -- Rock Lance (Normal)
     [268362]  = { cooldown = 15.4, start =  3.8 },  -- Mining Charge
     [268702]  = { cooldown = 17.7, start =  5.2 },  -- Furious Quake (Normal)
     [263215]  = { cooldown = 20.5, start =  4.7 },  -- Tectonic Barrier

@@ -34,8 +34,8 @@ function E:InitCooldownFrame()
     --▶ Safe Time Bar (쿨다운 프레임 하위에 attach)
     local sb = CreateFrame("StatusBar", nil, cf)
     -- 부모 하단에 붙이되, 좌우는 부모와 0 간격으로
-    sb:SetPoint("TOPLEFT",  cf, "BOTTOMLEFT",  0, -5)
-    sb:SetPoint("TOPRIGHT", cf, "BOTTOMRIGHT", 0, -5)
+    sb:SetPoint("TOPLEFT",  cf, "BOTTOMLEFT",  0, -2)
+    sb:SetPoint("TOPRIGHT", cf, "BOTTOMRIGHT", 0, -2)
     sb:SetHeight(8)   -- 높이만 고정
 
     -- ▶ 1px 검은 테두리
@@ -68,8 +68,13 @@ function E:InitCooldownFrame()
     spark:Hide()
     sb.spark = spark
 
-    sb.remainingText = sb:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    sb.remainingText:SetPoint("TOPRIGHT", sb, "TOPRIGHT", -2, 2)
+    sb.remainingText = sb:CreateFontString(nil, "OVERLAY", "GameFontNormalSmallOutline")
+    sb.remainingText:ClearAllPoints()
+    sb.remainingText:SetPoint("TOPRIGHT", sb, "BOTTOMRIGHT", -2, -2)
+    -- 글자색
+    sb.remainingText:SetTextColor(1, 1, 1, 1)
+    -- 폰트 파일, 크기, 아웃라인 플래그 덮어쓰기
+    sb.remainingText:SetFont(STANDARD_TEXT_FONT, 14, "OUTLINE")
 
     sb.showing = false
     sb:Hide()
@@ -167,6 +172,9 @@ function E:SetIconPool(spells)
     local db = E.DB
     local opts    = db.cooldownFrame
     local parent  = E.CooldownFrame
+
+
+    E.CooldownFrame.lastSafeEndTime = math.max(E.CooldownFrame.lastSafeEndTime,GetTime() + 1.1 )
 
     -- ◀ 1) 이전에 만든 버튼들 완전 해제
     for _, btn in ipairs(parent.iconPool) do
