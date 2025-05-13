@@ -97,7 +97,6 @@ function E:GetSpellInfoFromOmniCd(spellID)
 
 end
 
-
 --- 모든 파티원의 Active 스펠(아이콘으로 띄워진) 목록을 우선순위·스펠ID·플레이어 이름 순으로 정렬해서 반환
 -- @param type      string: "aoeCC", "interrupt", "defensive", "offensive", "utility"
 -- @param num       number|nil: 반환할 최대 개수. nil 이거나 1 미만이면 제한없이 모두 반환.
@@ -115,71 +114,66 @@ function E:GetSortedGroupSpellsByType(spellTypes, num, onlyReady , nextCast)
     end
 
 
+
     local now = GetTime()
     local nextCastRemaining = (nextCast and (nextCast - now) or 0 ) * 1000
-    local tmp = {}
+    if not onlyReady then
+        nextCastRemaining = math.huge
+    end
 
-    -- 2) 각 타입마다 뽑아서 onlyReady 조건 필터
+    local result = {}
+    local spellPool = {}
     for _, t in ipairs(typesList) do
         for _, spell in ipairs(self:GetGroupSpellsByType(t)) do
-            if not onlyReady or (spell.remaining or 0) <= nextCastRemaining then
-
-                spell.remaining = spell.remaining or 0
-                tinsert(tmp, spell)
-            end
+            tinsert(spellPool, spell)
         end
     end
 
-    -- 2) 우선순위·스펠ID·플레이어 이름 순으로 정렬
-    table.sort(tmp, function(a, b)
-        local aReady = (a.remaining or 0) <= nextCastRemaining
-        local bReady = (b.remaining or 0) <= nextCastRemaining
-
-        if not onlyReady then
-            -- 1) ready 스펠 우선
-            if aReady ~= bReady then
-                return aReady and true or false
-            end
-            -- 2) 둘 다 ready 면 priority 내림차순
-            if aReady and bReady then
-                if a.priority ~= b.priority then
-                    return a.priority > b.priority
-                end
-            else
-                -- 3) 둘 다 준비되지 않음(쿨다운 중) → remaining 오름차순
-                if a.remaining ~= b.remaining then
-                    return a.remaining < b.remaining
-                end
-                -- 4) remaining 같으면 priority 내림차순
-                if a.priority ~= b.priority then
-                    return a.priority > b.priority
-                end
-            end
-        else
-            -- onlyReady == true 면 기존 priority 기준 정렬 유지
-            if a.priority ~= b.priority then
-                return a.priority > b.priority
-            end
+    table.sort(spellPool, function(a,b)
+        if a.priority ~= b.priority then
+            return a.priority > b.priority
         end
 
-        -- 공통 페일오버: id 오름차순 → unitName 오름차순
         if a.id ~= b.id then
             return a.id < b.id
         end
-        return a.unitName < b.unitName
-    end)
 
-    -- 3) num 개수만큼 잘라내기
-    if num and num >= 1 then
-        local tmp2 = {}
-        for i = 1, math.min(num, #tmp) do
-            tinsert(tmp2, tmp[i])
+        return a.unitName < b.unitName
+    end )
+
+    while #result < num do
+
+        nextCastRemaining = nextCastRemaining + #result * 1500
+
+
+        local tmp = {}
+
+        for _, spell in ipairs(spellPool) do
+            if not spell.remaining or spell.remaining <= nextCastRemaining then
+                tinsert(tmp, spell)
+            end
         end
-        tmp = tmp2
+
+        if #tmp == 0 then
+            break
+        end
+
+        for _, spell in ipairs(tmp) do
+            tinsert(result, spell)
+        end
+        for _, spell in ipairs(tmp) do
+            for i = #spellPool, 1, -1 do
+                if spellPool[i] == spell then
+                    tremove(spellPool, i)
+                    break
+                end
+            end
+        end
     end
 
+
     -- 4) 그 외에는 전체 반환
-    return tmp
+    return result
 end
 
 function E:GetCombinedSpells(spellType, num , onlyReady ,nextCast)

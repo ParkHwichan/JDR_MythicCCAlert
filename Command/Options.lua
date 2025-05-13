@@ -162,6 +162,15 @@ local function buildConfigWidgets(frame)
         E:RefreshCooldownFrame()
     end)
 
+    -- 3) 사용자 이름 토글
+    local cbGlow = AceGUI:Create("CheckBox")
+    cbGlow:SetLabel("아이콘 사용자 이름 보이기")
+    cbGlow:SetValue(DB.cooldownFrame.show_name)
+    cbGlow:SetCallback("OnValueChanged", function(_,_,v)
+        DB.cooldownFrame.show_name = v
+    end)
+    frame:AddChild(cbGlow)
+
     -- 4) 글로우 토글
     local cbGlow = AceGUI:Create("CheckBox")
     cbGlow:SetLabel("내 사용 순서에 반짝임")

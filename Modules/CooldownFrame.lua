@@ -124,7 +124,7 @@ function E:InitCooldownFrame()
 end
 
 
-local function CreateSpellButton(parent, size, spellID, pointArgs)
+local function CreateSpellButton(parent, size, spellID, pointArgs, unit)
     -- parent: 버튼을 붙일 프레임
     -- size: 버튼 크기
     -- spellID: C_Spell.GetSpellTexture 에 넘길 스펠 ID
@@ -154,6 +154,47 @@ local function CreateSpellButton(parent, size, spellID, pointArgs)
     local cd = CreateFrame("Cooldown", nil, btn, "CooldownFrameTemplate")
     cd:SetAllPoints(btn)
     btn.cd = cd
+
+    if unit and unit.unitName then
+        -- ▶ 하단 이름 (FontString)
+        local nameText = btn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmallOutline")
+        nameText:SetPoint("BOTTOM", btn, "BOTTOM", 0, 2)
+        nameText:SetJustifyH("CENTER")
+        nameText:SetText(unit.unitName or "")
+        nameText:SetWordWrap(false)
+        nameText:SetWidth(size - 4)
+        -- 클래스 색상 적용
+        local classColor = (C_ClassColor.GetClassColor and C_ClassColor.GetClassColor(unit.class)) or { r = 1, g = 1, b = 1 }
+        nameText:SetTextColor(classColor.r, classColor.g, classColor.b)
+        btn.nameText = nameText
+
+        -- ▶ 텍스트 + ellipsis 처리
+        local function SetNameWithEllipsis(text)
+            -- 최대 너비를 벗어나면 자르고 … 붙이기
+            nameText:SetText(text)
+            if nameText:GetStringWidth() > nameText:GetWidth() then
+                -- 대략 문자열 길이 이진 탐색
+                local left, right = 1, #text
+                local best = 1
+                while left <= right do
+                    local mid = math.floor((left + right) / 2)
+                    nameText:SetText(text:sub(1, mid) .. "…")
+                    if nameText:GetStringWidth() <= nameText:GetWidth() then
+                        best = mid
+                        left = mid + 1
+                    else
+                        right = mid - 1
+                    end
+                end
+                nameText:SetText(text:sub(1, best) .. "…")
+            end
+            nameText:SetTextColor(classColor.r, classColor.g, classColor.b)
+        end
+
+        SetNameWithEllipsis(unit.unitName or "")
+
+    end
+
 
     return btn
 end
@@ -208,8 +249,17 @@ function E:SetIconPool(spells)
                 and { "BOTTOMRIGHT", parent, "BOTTOMRIGHT", 0, 0 }
                 or { "BOTTOMRIGHT", parent.iconPool[i-1], "BOTTOMLEFT", -opts.margin, 0 }
 
+
+        local unit = nil
+        if E.DB.cooldownFrame.show_name then
+            unit = {
+                unitName = spell.unitName,
+                class    = spell.class,
+            }
+        end
+
         -- 버튼 생성 및 크기
-        local btn = CreateSpellButton(parent, size, spell.id, pt)
+        local btn = CreateSpellButton(parent, size, spell.id, pt, unit)
         btn.spell = spell
         btn.isFlashing = false
         btn.combinedButtons = {}

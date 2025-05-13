@@ -97,9 +97,13 @@ f:SetScript("OnEvent", function(self, ...)
             end
 
             if E.Config.enemySpellCooldowns[extraSpellID] and E.Config.enemySpellCooldowns[extraSpellID].cooldown then
+
+                local silence = (E.Config.spells[extraSpellID] and E.Config.spells[extraSpellID].silence) or 3
+
+
                 E.InCombatMobs[dstGUID].cooldowns[extraSpellID] = {
                     id = extraSpellID,
-                    nextCast = GetTime() + math.max(E.Config.enemySpellCooldowns[extraSpellID].cooldown,2 ),
+                    nextCast = GetTime() + math.max(E.Config.enemySpellCooldowns[extraSpellID].cooldown, silence + 0.5),
                 }
                 E.CooldownFrame:SetSafeEndTime(E:GetLeastEnemyNextCast())
 

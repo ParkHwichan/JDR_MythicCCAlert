@@ -27,6 +27,8 @@ E.Config.CCAuras = {
     silences = {
         [204490] = { name = "침묵의인장" , },
         [81261] = { name = "태광"},
+        [97547] = {name = "태광"},
+
     },
     disorients = {
         [2094]   = { name = "Blind" },               -- Rogue :contentReference[oaicite:0]{index=0}
@@ -46,7 +48,8 @@ E.Config.CCAuras = {
     },
     cc = {
         [217832] = {name = "감금"}
-    }
+    },
+
 
 }
 

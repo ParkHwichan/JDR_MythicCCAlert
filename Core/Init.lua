@@ -16,6 +16,7 @@ AddOn.defaults = {
                                                 show_glow   = true,
                                                 lock        = false,
                                                 sound_alert = true,
+                                                show_name = true,
                                             },
 } }
 
