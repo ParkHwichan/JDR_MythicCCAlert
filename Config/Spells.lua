@@ -24,7 +24,7 @@ E.Config.spells = {
     [157980] = {name = "초신성",  soundPath = "mage_aoe_1", type = "aoeCC", class = "MAGE", cooldown = 45, priority = 8 },
     [157981] = { name = "화폭", soundPath = "mage_aoe_2", type = "aoeCC", class = "MAGE", cooldown = 45, priority = 7 },
     [99] = { name = "행불포",soundPath = "druid_aoe_1", type = "aoeCC", class = "DRUID", cooldown = 30, priority = 6 },
-    ["interrupt_combine"]  = { name = "개인짤" , soundPath = "짤" , type = "interruptCombine" , class="UNKNOWN", priority = 5 },
+    ["interrupt_combine"]  = { name = "개인짤" , soundPath = "interrupt" , type = "interruptCombine" , class="UNKNOWN", priority = 5 },
     [61392] = { name = "태풍", soundPath = "druid_aoe_2", type = "aoeCC", class = "DRUID", cooldown = 30, priority = 4 },
     [132469] = { name = "태풍", soundPath = "druid_aoe_1", type = "aoeCC", class = "DRUID", cooldown = 30, priority = 3 },
     [207684] = { name = "공포", soundPath = "fear", type = "aoeCC", class = "DEMONHUNTER", cooldown = 120, priority = 2 }, -- 혼돈의 회오리

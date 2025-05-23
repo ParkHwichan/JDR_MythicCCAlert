@@ -54,8 +54,6 @@ function E:GetCharacterSound(playerName, classToken)
     -- ③ 매핑이 없다면 nil 반환
     if not fileName then return nil end
 
-    print(string.format("Interface\\AddOns\\%s\\sounds\\%s.ogg",
-            ADDON_NAME, fileName))
     -- ④ 풀 패스 구성 (백슬래시 2개는 Lua 문자열 이스케이프)
     return string.format("Interface\\AddOns\\%s\\sounds\\%s.ogg",
             ADDON_NAME, fileName)

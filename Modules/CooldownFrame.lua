@@ -415,7 +415,7 @@ function E:UpdateIconPool(spells)
                     soundPath = nextSpellConfig.soundPath
                 end
                 if not soundPath and s.type == "interrupt" then
-                    soundPath = "짤"
+                    soundPath = "interrupt"
                 end
                 E:PlaySound(false, unitName, class, soundPath)
             end
