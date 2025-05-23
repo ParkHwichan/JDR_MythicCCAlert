@@ -213,9 +213,33 @@ function E:SetIconPool(spells)
     local db = E.DB
     local opts    = db.cooldownFrame
     local parent  = E.CooldownFrame
+    local options = db.cooldownFrame
 
 
     E.CooldownFrame.lastSafeEndTime = math.max(E.CooldownFrame.lastSafeEndTime,GetTime() + 1.1 )
+
+    local lastFirstSpell = parent.iconPool[1] and parent.iconPool[1].spell
+    local newFirstSpell = spells[1]
+    local isFirstSame = lastFirstSpell and newFirstSpell and lastFirstSpell.id == newFirstSpell.id and
+            lastFirstSpell.unitName == newFirstSpell.unitName
+    local isFirst = newFirstSpell and newFirstSpell.unitName == UnitName("player")
+
+    if options.sound_alert and isFirst and not isFirstSame then
+        local unitName = newFirstSpell.unitName or UNKNOWN
+        local class = newFirstSpell.class or UNKNOWN
+
+        local nextSpellConfig = E.Config.spells[newFirstSpell.id]
+
+        local soundPath = nil
+        if nextSpellConfig and nextSpellConfig.soundPath then
+            soundPath = nextSpellConfig.soundPath
+        end
+        if not soundPath and newFirstSpell.type == "interrupt" then
+            soundPath = "interrupt"
+        end
+        E:PlaySound(true, unitName, class, soundPath)
+    end
+
 
     -- ◀ 1) 이전에 만든 버튼들 완전 해제
     for _, btn in ipairs(parent.iconPool) do
@@ -395,7 +419,10 @@ function E:UpdateIconPool(spells)
         local isNotSafe =  GetTime() > E.CooldownFrame.lastSafeEndTime
         local isLastBtn = E.CooldownFrame.lastFirstButton.player == s.unitName and E.CooldownFrame.lastFirstButton.spellID == s.id
 
+
         local shouldFlash = isFirst and isPlayer and isReady and isNotSafe and not isLastBtn
+
+
 
         if shouldFlash  then
             E.CooldownFrame.lastFirstButton = {
@@ -404,21 +431,7 @@ function E:UpdateIconPool(spells)
                 remaining = s.remaining,
             }
 
-            if options.sound_alert then
-                local unitName = s.unitName or UNKNOWN
-                local class = s.class or UNKNOWN
 
-                local nextSpellConfig = E.Config.spells[s.id]
-
-                local soundPath = nil
-                if nextSpellConfig and nextSpellConfig.soundPath then
-                    soundPath = nextSpellConfig.soundPath
-                end
-                if not soundPath and s.type == "interrupt" then
-                    soundPath = "interrupt"
-                end
-                E:PlaySound(false, unitName, class, soundPath)
-            end
 
             if options.show_glow then
                 LibStub("LibButtonGlow-1.0").ShowOverlayGlow(btn)
