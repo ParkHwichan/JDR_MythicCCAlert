@@ -1,0 +1,10 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="Config.lua"/>
+	<Script file="Spells.lua"/>
+	<Script file="Monsters.lua"/>
+	<Script file="EnemySpells.lua"/>
+	<Script file="EnemySpellsCooldown.lua"/>
+	<Script file="RaidFlags.lua"/>
+	<Script file="CCAuras.lua"/>
+</Ui>

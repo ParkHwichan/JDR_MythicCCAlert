@@ -1,0 +1,21 @@
+## Interface: 100207
+## Title: JDR_MythicCCAlert
+## Notes: 쐐기 광역 CC 및 차단 알림
+## Version: 1.0.02
+## Author: JongDaRi
+## Dependencies : OmniCD
+## OptionalDeps: LibSharedMedia-3.0, SharedMedia
+## X-Embeds: LibSharedMedia-3.0
+## SavedVariables: JDR_MythicCCAlertDB
+## IconTexture: Interface\AddOns\JDR_MythicCCAlert\Media\logo
+# --- Libraries ---
+Embeds.xml
+Core\Core.xml
+DB\Db.xml
+Config\Config.xml
+Command\Command.xml
+Options\Options.xml
+Utils\Utils.xml
+Modules\Modules.xml
+Event\Event.xml
+# Test\Test.xml
