@@ -223,7 +223,7 @@ function E:SetIconPool(spells)
     local isFirstSame = lastFirstSpell and newFirstSpell and lastFirstSpell.id == newFirstSpell.id and
             lastFirstSpell.unitName == newFirstSpell.unitName
     local isFirst = newFirstSpell and newFirstSpell.unitName == UnitName("player")
-    local isCombined = newFirstSpell.combinedSpells and #newFirstSpell.combinedSpells > 0
+    local isCombined = newFirstSpell and newFirstSpell.combinedSpells and #newFirstSpell.combinedSpells > 0
 
     if options.sound_alert and isFirst and not isFirstSame then
         local unitName = newFirstSpell.unitName or UNKNOWN
