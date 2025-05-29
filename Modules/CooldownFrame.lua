@@ -223,6 +223,7 @@ function E:SetIconPool(spells)
     local isFirstSame = lastFirstSpell and newFirstSpell and lastFirstSpell.id == newFirstSpell.id and
             lastFirstSpell.unitName == newFirstSpell.unitName
     local isFirst = newFirstSpell and newFirstSpell.unitName == UnitName("player")
+    local isCombined = newFirstSpell.combinedSpells and #newFirstSpell.combinedSpells > 0
 
     if options.sound_alert and isFirst and not isFirstSame then
         local unitName = newFirstSpell.unitName or UNKNOWN
@@ -238,6 +239,8 @@ function E:SetIconPool(spells)
             soundPath = "interrupt"
         end
         E:PlaySound(true, unitName, class, soundPath)
+    elseif options.sound_alert and isCombined and not isFirstSame then
+        E:PlaySound(true, nil, nil, "interrupt_combine")
     end
 
 

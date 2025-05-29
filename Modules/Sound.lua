@@ -91,7 +91,7 @@ function E:PlaySound(next, playerName, classToken, spellSoundOverride)
     end
 
     -- 2) 플레이어별 사운드
-    local charPath = self:GetCharacterSound(playerName, classToken)
+    local charPath = (playerName or classToken) and self:GetCharacterSound(playerName, classToken)
     if charPath then
         delay = delay + interval
         C_Timer.After(delay, function()

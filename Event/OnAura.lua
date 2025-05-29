@@ -62,7 +62,9 @@ f:SetScript("OnEvent", function(self, event, ...)
                         local defaultDur = cfg.duration or 0.2
 
                         if unit and UnitExists(unit) then
+
                             local aura = C_UnitAuras.GetAuraDataBySpellName(unit, spellName, "HARMFUL")
+
                             if aura then
                                 duration       = aura.duration or 0
                                 expirationTime = aura.expirationTime or 0
