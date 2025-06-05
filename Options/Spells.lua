@@ -20,7 +20,6 @@ hooksecurefunc("SetItemRef", function(link, text, button, chatFrame, ...)
 
     -- 여기가 COMM_REQ 와 같아야 동작
     AceComm:SendCommMessage(COMM_REQ, key, "PARTY", nil, "BULK")
-    print(("|cffa330c9[JDR]|r 프로필 '%s' 요청 전송"):format(key))
 end)
 -- 3) 요청 수신 핸들러 → 데이터 직렬화·전송
 AceComm:RegisterComm(COMM_REQ, function(_, key, _, sender)

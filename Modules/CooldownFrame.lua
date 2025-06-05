@@ -215,34 +215,38 @@ function E:SetIconPool(spells)
     local parent  = E.CooldownFrame
     local options = db.cooldownFrame
 
-
     E.CooldownFrame.lastSafeEndTime = math.max(E.CooldownFrame.lastSafeEndTime,GetTime() + 1.1 )
 
-    local lastFirstSpell = parent.iconPool[1] and parent.iconPool[1].spell
-    local newFirstSpell = spells[1]
-    local isFirstSame = lastFirstSpell and newFirstSpell and lastFirstSpell.id == newFirstSpell.id and
-            lastFirstSpell.unitName == newFirstSpell.unitName
-    local isFirst = newFirstSpell and newFirstSpell.unitName == UnitName("player")
-    local isCombined = newFirstSpell and newFirstSpell.combinedSpells and #newFirstSpell.combinedSpells > 0
-
-    if options.sound_alert and isFirst and not isFirstSame then
-        local unitName = newFirstSpell.unitName or UNKNOWN
-        local class = newFirstSpell.class or UNKNOWN
-
-        local nextSpellConfig = E.Config.spells[newFirstSpell.id]
-
-        local soundPath = nil
-        if nextSpellConfig and nextSpellConfig.soundPath then
-            soundPath = nextSpellConfig.soundPath
-        end
-        if not soundPath and newFirstSpell.type == "interrupt" then
-            soundPath = "interrupt"
-        end
-        E:PlaySound(true, unitName, class, soundPath)
-    elseif options.sound_alert and isCombined and not isFirstSame then
-        E:PlaySound(true, nil, nil, "interrupt_combine")
+    if not  spells then
+        return
     end
 
+    if spells and #spells > 0 then
+        local lastFirstSpell = parent.iconPool[1] and parent.iconPool[1].spell
+        local newFirstSpell = spells[1]
+        local isFirstSame = lastFirstSpell and newFirstSpell and lastFirstSpell.id == newFirstSpell.id and
+                lastFirstSpell.unitName == newFirstSpell.unitName
+        local isFirst = newFirstSpell and newFirstSpell.unitName == UnitName("player")
+        local isCombined = newFirstSpell and newFirstSpell.combinedSpells and #newFirstSpell.combinedSpells > 0
+
+        if options.sound_alert and isFirst and not isFirstSame then
+            local unitName = newFirstSpell.unitName or UNKNOWN
+            local class = newFirstSpell.class or UNKNOWN
+
+            local nextSpellConfig = E.Config.spells[newFirstSpell.id]
+
+            local soundPath = nil
+            if nextSpellConfig and nextSpellConfig.soundPath then
+                soundPath = nextSpellConfig.soundPath
+            end
+            if not soundPath and newFirstSpell.type == "interrupt" then
+                soundPath = "interrupt"
+            end
+            E:PlaySound(true, unitName, class, soundPath)
+        elseif options.sound_alert and isCombined and not isFirstSame then
+            E:PlaySound(true, nil, nil, "interrupt_combine")
+        end
+    end
 
     -- ◀ 1) 이전에 만든 버튼들 완전 해제
     for _, btn in ipairs(parent.iconPool) do

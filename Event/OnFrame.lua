@@ -80,9 +80,10 @@ f:SetScript("OnUpdate", function(self, elapsed)
     end
 
 
-    if E.CombatSitu == "NO_COMBAT" then
+    if E.CombatSitu == "NO_COMBAT" and not E.showingConfig then
         -- iconPool 테이블 비우기 (기존 참조 유지)
         if next(E.CooldownFrame.iconPool) then
+
             E:SetIconPool({  })
         end
         return

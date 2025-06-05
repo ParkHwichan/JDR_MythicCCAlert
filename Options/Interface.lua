@@ -1,7 +1,7 @@
 local E = unpack(select(2, ...))
 local AceGUI = E.Libs.AceGUI -- AceGUI-3.0
 
-local testSpells = {
+E.testSpells = {
     [1] = {
         guid      = 1,
         class     = "DEATHKNIGHT",
@@ -87,6 +87,8 @@ local testSpells = {
 
 
 function E.Options:buildInterfaceTab(parent)
+    local testSpells = E.testSpells
+
     parent:ReleaseChildren()
     parent:SetLayout("Fill")
 
@@ -96,6 +98,18 @@ function E.Options:buildInterfaceTab(parent)
     scroll:SetFullWidth(true)
     scroll:SetFullHeight(true)
     parent:AddChild(scroll)
+
+    -- 4) 체크박스들도 가로폭 꽉 채우기
+    local function makeCheck(label, valueGetter, valueSetter)
+        local cb = AceGUI:Create("CheckBox")
+        cb:SetLabel(label)
+        cb:SetValue(valueGetter())
+        cb:SetFullWidth(true)
+        cb:SetCallback("OnValueChanged", function(_,_,v)
+            valueSetter(v)
+        end)
+        scroll:AddChild(cb)
+    end
 
     -- 2) 슬라이더 헬퍼 (scroll 에 붙입니다)
     local function makeSlider(name, min, max, step, cur, onChanged)
@@ -121,6 +135,20 @@ function E.Options:buildInterfaceTab(parent)
     end
     local DB = E.DB
 
+    makeCheck("테스트 모드",
+            function() return E.Options.testMode end,
+            function(v)
+                E.Options.testMode = v
+                if v then
+
+                    E:SetIconPool(E.testSpells)  -- 실제 로직에 맞게 조정
+                else
+
+                    E:SetIconPool({})  -- 실제 로직에 맞게 조정
+                end
+            end
+    )
+
     -- 3) 아이콘 관련 슬라이더
     makeSlider("표시 스킬 갯수", 1, 5, 1, DB.cooldownFrame.max_icon, function(v)
         DB.cooldownFrame.max_icon = v
@@ -139,17 +167,7 @@ function E.Options:buildInterfaceTab(parent)
         E:RefreshCooldownFrame()
     end)
 
-    -- 4) 체크박스들도 가로폭 꽉 채우기
-    local function makeCheck(label, valueGetter, valueSetter)
-        local cb = AceGUI:Create("CheckBox")
-        cb:SetLabel(label)
-        cb:SetValue(valueGetter())
-        cb:SetFullWidth(true)
-        cb:SetCallback("OnValueChanged", function(_,_,v)
-            valueSetter(v)
-        end)
-        scroll:AddChild(cb)
-    end
+
 
     makeCheck("아이콘 사용자 이름 보이기",
             function() return DB.cooldownFrame.show_name end,
@@ -167,6 +185,7 @@ function E.Options:buildInterfaceTab(parent)
             function() return DB.cooldownFrame.lock end,
             function(v)
                 DB.cooldownFrame.lock = v
+                E:RefreshCooldownFrame()
                 E.CooldownFrame:EnableMouse(not v)
             end
     )
